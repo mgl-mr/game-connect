@@ -1,11 +1,29 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
-import HomeView from '../views/HomeView.vue';
+import SignIn from '@/components/SignIn.vue';
+import SignUp from '@/components/SignUp.vue';
+import ForgotPass from '@/components/ForgotPass.vue';
+import Authentication from '@/views/Authentication.vue';
 
 const routes = [
   {
     path: '/',
-    name: 'home',
-    component: HomeView,
+    name: 'authentication',
+    redirect: '/sign-in',
+    component: Authentication,
+    children: [
+      {
+        path: 'sign-in',
+        component: SignIn,
+      },
+      {
+        path: 'sign-up',
+        component: SignUp,
+      },
+      {
+        path: 'forgot-pass',
+        component: ForgotPass,
+      },
+    ],
   },
 ];
 
