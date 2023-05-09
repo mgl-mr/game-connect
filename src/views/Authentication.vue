@@ -34,6 +34,15 @@ export default {
 .logo {
   width: calc(15vw + 10vh);
   height: calc(15vw + 10vh);
+  animation: logo 2s linear infinite;
+}
+
+.component {
+  width: 100%;
+  height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /***  AUTH ***/
@@ -42,5 +51,18 @@ export default {
   width: 60%;
 
   background: linear-gradient(180deg, var(--dark) 15%, var(--primary) 220%);
+}
+
+@keyframes logo {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    /* transform: rotate(360deg); */
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 </style>

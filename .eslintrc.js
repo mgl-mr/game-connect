@@ -21,5 +21,6 @@ module.exports = {
     'import/named': 'off',
     'import/no-extraneous-dependencies': 'off',
     'vue/multi-word-component-names': 'off',
+    'consistent-return': 'off',
   },
 };
