@@ -37,14 +37,13 @@
     </div>
 
     <div class="button-overflow">
-      <div class="button-border"></div>
+      <div class="button-border" :class="{'loading':loading}"></div>
       <button type="submit" class="auth-button">CONTINUAR</button>
     </div>
   </form>
 </template>
 
 <script>
-import store from '@/store';
 
 export default {
   name: 'SignIn',
@@ -57,16 +56,30 @@ export default {
       error: false,
       emailError: false,
       passwordError: false,
+      loading: false,
     };
   },
 
   methods: {
-    enter(e) {
+    async enter(e) {
       e.preventDefault();
       if (this.validate()) {
-        // TODO: login no frebase
+        this.loading = true;
+        const login = await this.$store.dispatch('login', {
+          email: this.email,
+          password: this.password,
+        });
+        this.loading = false;
+
+        if (login === true) {
+          // TODO: ir para home
+        } else {
+          this.msg = login;
+          this.error = true;
+        }
       }
     },
+
     validate() {
       if (this.email === '' || this.password === '') {
         this.msg = 'Preencha todos os campos!';
@@ -189,11 +202,6 @@ export default {
   box-shadow: 0 0 3px 1px rgba(255, 255, 255, 0.5);
 }
 
-.button-overflow:hover > .button-border{
-  display: block;
-  animation: hoverMovement 2s linear infinite;
-}
-
 .auth-button {
   position: absolute;
   width: calc(29.5vw + 5px);
@@ -225,6 +233,11 @@ export default {
   font-size: 1.5vw;
   color: var(--white);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.loading{
+  display: block;
+  animation: hoverMovement 2s linear infinite;
 }
 
 .error {
