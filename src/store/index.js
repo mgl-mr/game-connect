@@ -6,7 +6,7 @@ import getters from './getters';
 
 export default createStore({
   state: {
-    users: [],
+    user: {},
   },
   getters,
   mutations,
