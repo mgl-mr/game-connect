@@ -32,7 +32,14 @@ export default {
       return this.$route.path === '/sign-in';
     },
     isSignUpRoute() {
-      return this.$route.path === '/sign-up';
+      if (
+        this.$route.path === '/sign-up/sign-up1' ||
+        this.$route.path === '/sign-up/sign-up2' ||
+        this.$route.path === '/sign-up/sign-up3' ||
+        this.$route.path === '/sign-up/sign-up4'
+      ) {
+        return true;
+      }
     },
     isForgotPassRoute() {
       return this.$route.path === '/forgot-pass';
