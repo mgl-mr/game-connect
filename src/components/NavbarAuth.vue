@@ -32,14 +32,12 @@ export default {
       return this.$route.path === '/sign-in';
     },
     isSignUpRoute() {
-      if (
-        this.$route.path === '/sign-up/sign-up1' ||
-        this.$route.path === '/sign-up/sign-up2' ||
-        this.$route.path === '/sign-up/sign-up3' ||
-        this.$route.path === '/sign-up/sign-up4'
-      ) {
-        return true;
-      }
+      return (
+        this.$route.path === '/sign-up/sign-up1'
+        || this.$route.path === '/sign-up/sign-up2'
+        || this.$route.path === '/sign-up/sign-up3'
+        || this.$route.path === '/sign-up/sign-up4'
+      );
     },
     isForgotPassRoute() {
       return this.$route.path === '/forgot-pass';
@@ -72,6 +70,7 @@ export default {
   background-image: linear-gradient(45deg, var(--primary), var(--accent));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .auth-link-selected {
