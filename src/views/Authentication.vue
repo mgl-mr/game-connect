@@ -4,7 +4,7 @@
       <img src="@/assets/images/logo.png" class="logo" alt="Logo Game Connect">
     </div>
     <div class="container-auth">
-      <navbar-auth />
+      <NavbarAuth />
       <router-view class="component" />
     </div>
   </div>
@@ -40,9 +40,6 @@ export default {
 .component {
   width: 100%;
   height: 80vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 /***  AUTH ***/
