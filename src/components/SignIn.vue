@@ -37,14 +37,13 @@
     </div>
 
     <div class="button-overflow">
-      <div class="button-border" :class="{'loading':loading}"></div>
+      <div class="button-loading" :class="{'loading':loading}"></div>
       <button type="submit" class="auth-button">CONTINUAR</button>
     </div>
   </form>
 </template>
 
 <script>
-
 export default {
   name: 'SignIn',
 
@@ -123,31 +122,36 @@ export default {
 
 <style scoped>
 .form-auth {
+  height: 80vh;
+  display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .label {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 2vw;
+  width: 60%;
+  margin-bottom: 2vh;
 }
 
 .input-image {
-  width: 5vw;
-  height: 5vw;
+  width: 15%;
+  height: 10vh;
 }
 
 .input {
-  height: calc(5vw - 10px);
-  width: 25vw;
+  height: 9vh;
+  width: 80%;
   border: 0;
   padding: 0;
   margin-left: 10px;
   padding: 0 5px;
   background: var(--primary);
   color: var(--white);
-  border: 5px solid var(--accent);
+  border: 0.5vh solid var(--accent);
   border-radius: 0px 50px 50px 0px;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 1.5vw;
@@ -181,14 +185,14 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 15px;
+  width: calc(60% - 1vh);
+  height: 9vh;
   background: transparent;
-  width: calc(30vw + 5px);
-  height: 5vw;
-  border: 5px solid var(--accent);
+  border: 0.5vh solid var(--accent);
+  border-radius: 15px;
 }
 
-.button-border {
+.button-loading {
   display: none;
   position: absolute;
   left: 0;
@@ -204,8 +208,8 @@ export default {
 
 .auth-button {
   position: absolute;
-  width: calc(29.5vw + 5px);
-  height: 4.5vw;
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
   background-color: var(--accent);
   color: var(--primary);
   border: 0;
@@ -237,7 +241,7 @@ export default {
 
 .loading{
   display: block;
-  animation: hoverMovement 2s linear infinite;
+  animation: loading 2s linear infinite;
 }
 
 .error {
@@ -257,7 +261,7 @@ export default {
   100% { transform: translateX(0); }
 }
 
-@keyframes hoverMovement {
+@keyframes loading {
   0% { left: -10%; }
   50% { left: 90%; }
   100% { left: -10%; }
