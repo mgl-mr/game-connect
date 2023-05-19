@@ -99,6 +99,7 @@ export default {
   width: 60%;
   height: 5px;
   margin-top: 30px;
+  margin-bottom: 1.5vw;
   border-radius: 2.5px;
   background-color: var(--accent);
 }
