@@ -1,6 +1,6 @@
 <template>
   <form class="form-auth" @submit="enter">
-    <label for="name" class="label">
+    <label for="email" class="label">
       <img
         src="@/assets/images/auth/auth_input_email.png"
         alt="imagem de email"
@@ -8,7 +8,7 @@
       >
       <input
         type="text"
-        name="name"
+        name="email"
         class="input"
         :class="{ 'input-error': emailError }"
         placeholder="Digite seu email"
@@ -155,6 +155,7 @@ export default {
   border-radius: 0px 50px 50px 0px;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 1.5vw;
+  transition: background-color 0.5s ease;
 }
 
 .input::placeholder {
@@ -168,7 +169,7 @@ export default {
 .input:focus {
   box-shadow: 0 0 0px 0px rgba(255, 255, 255, 0.5);
   outline: 0;
-  background: var(--dark);
+  background-color: var(--dark);
   border-color: var(--primary);
   color: var(--white);
   font-size: 1vw;
