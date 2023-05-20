@@ -94,7 +94,7 @@ export default {
   },
 
   methods: {
-    async next(e) {
+    next(e) {
       e.preventDefault();
       if (this.validate()) {
         this.$router.push('/sign-up/sign-up2');
@@ -184,8 +184,8 @@ export default {
       email: this.email,
       password: this.password,
       confirm: this.confirm,
-    })
-  }
+    });
+  },
 };
 </script>
 
@@ -261,16 +261,6 @@ export default {
   background: transparent;
   border: 0.5vh solid var(--accent);
   border-radius: 15px;
-}
-
-.button-loading {
-  display: none;
-  position: absolute;
-  left: 0;
-  width: 100px;
-  height: 100px;
-  background: linear-gradient(to right, var(--primary), var(--white));
-  box-shadow: 0 0 3px 1px rgba(255, 255, 255, 0.5);
 }
 
 .button-overflow:hover {
