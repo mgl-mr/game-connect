@@ -12,6 +12,8 @@ export default createStore({
       email: '',
       password: '',
       confirm: '',
+      birthdate: '',
+      bio: '',
     },
   },
   getters,

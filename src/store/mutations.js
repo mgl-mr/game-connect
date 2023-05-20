@@ -4,6 +4,6 @@ export default {
   },
 
   setUserSignup(state, user) {
-    state.userSignup = Object.assign({}, state.userSignup, user);
-  }
+    state.userSignup = { ...state.userSignup, ...user };
+  },
 };
