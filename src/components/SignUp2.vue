@@ -13,7 +13,7 @@
         :class="{ 'input-error': birthdateError }"
         placeholder="Digite sua data de nascimento"
         v-model="birthdate"
-        @keypress="formatDate"
+        @keydown="formatDate"
       >
     </label>
 
@@ -102,6 +102,13 @@ export default {
 
     formatDate(e) {
       e.preventDefault();
+
+      if (e.keyCode === 8 && (this.birthdate.length === 3 || this.birthdate.length === 6)) {
+        this.birthdate = this.birthdate.slice(0, -2);
+      } else if (e.keyCode === 8 && this.birthdate.length !== 0) {
+        this.birthdate = this.birthdate.slice(0, -1);
+      }
+
       if (e.keyCode >= 48 && e.keyCode <= 57 && this.birthdate.length < 10) {
         this.birthdate += e.key;
         if (this.birthdate.length === 2 || this.birthdate.length === 5) {
@@ -286,11 +293,5 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   50% { transform: translateX(10px); }
   75% { transform: translateX(-10px); }
   100% { transform: translateX(0); }
-}
-
-@keyframes loading {
-  0% { left: -10%; }
-  50% { left: 90%; }
-  100% { left: -10%; }
 }
 </style>
