@@ -1,8 +1,6 @@
 <template>
   <form class="form-auth" @submit="next">
-    <div class="info">
-      Informe o horário do dia que mais joga:
-    </div>
+
     <label for="time" class="label">
       <img
         src="@/assets/images/auth/auth_input_time.png"
@@ -10,28 +8,33 @@
         class="input-image"
       >
       <div class="time">
-        <div :class="{ 'input-error': startError }">
-          <p>INICIO</p>
-          <input
-            type="text"
-            name="inicio"
-            class="input-time"
-            placeholder="00:00"
-            v-model="start"
-            @keydown="formatTimeStart"
-          >
+        <div class="info">
+          Informe o horário do dia que mais joga:
         </div>
+        <div class="container-inputs">
+          <div :class="{ 'input-error': startError }">
+              <p>INICIO</p>
+            <input
+              type="text"
+              name="inicio"
+              class="input-time"
+              placeholder="00:00"
+              v-model="start"
+              @keydown="formatTimeStart"
+            >
+          </div>
 
-        <div :class="{ 'input-error': endError }">
-          <p>FIM</p>
-          <input
-            type="text"
-            name="fim"
-            class="input-time"
-            placeholder="00:00"
-            v-model="end"
-            @keydown="formatTimeEnd"
-          >
+          <div :class="{ 'input-error': endError }">
+            <p>FIM</p>
+            <input
+              type="text"
+              name="fim"
+              class="input-time"
+              placeholder="00:00"
+              v-model="end"
+              @keydown="formatTimeEnd"
+            >
+          </div>
         </div>
       </div>
     </label>
@@ -236,15 +239,31 @@ export default {
 
 .time {
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
+  align-items: flex-start;
   justify-content: space-between;
   height: 9vh;
-  width: calc(80% + 1vh);
+  width: calc(80% + 10px + 1vh);
   border: 0;
   margin-left: 10px;
 }
 
-.time div {
+.info {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  color: var(--white);
+  font-family: var(--pressStart), Arial, Helvetica;
+  font-size: 0.6rem;
+}
+
+.container-inputs {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.container-inputs div {
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -252,21 +271,11 @@ export default {
   background: var(--primary);
   color: var(--white);
   border: 0.5vh solid var(--accent);
-  border-radius: 0;
+  border-radius: 0px 20px 20px 0px;
 }
 
 .time p {
   margin: 0;
-  color: var(--white);
-  font-family: var(--pressStart), Arial, Helvetica;
-  font-size: 0.6rem;
-}
-
-.info {
-  width: 60%;
-  margin: 0;
-  padding: 0;
-  margin-bottom: 5px;
   color: var(--white);
   font-family: var(--pressStart), Arial, Helvetica;
   font-size: 0.6rem;
