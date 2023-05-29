@@ -117,6 +117,13 @@ export default {
       return true;
     },
   },
+
+  mounted() {
+    if (this.$route.query.verify) {
+      this.msg = 'Conta registrada. Verifique seu email!';
+      this.error = true;
+    }
+  },
 };
 </script>
 
