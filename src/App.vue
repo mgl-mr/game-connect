@@ -5,6 +5,12 @@
 <script>
 export default {
   name: 'App',
+
+  async mounted() {
+    if (this.$store.state.games.length === 0) {
+      await this.$store.dispatch('fetchJogos');
+    }
+  },
 };
 </script>
 
