@@ -121,6 +121,10 @@ export default {
   mounted() {
     this.birthdate = this.$store.state.userSignup.birthdate;
     this.bio = this.$store.state.userSignup.bio;
+
+    if (this.$route.query.toValidate) {
+      this.validate();
+    }
   },
 
   unmounted() {
