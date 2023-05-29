@@ -9,6 +9,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendEmailVerification,
+  sendPasswordResetEmail,
 } from 'firebase/auth';
 
 import {
@@ -108,6 +109,20 @@ export default {
       }
 
       return 'Erro ao registrar conta.';
+    }
+  },
+
+  // eslint-disable-next-line no-unused-vars
+  async resetPass({ commit }, email) {
+    try {
+      await sendPasswordResetEmail(auth, email);
+      return true;
+    } catch (error) {
+      switch (error.code) {
+        case 'auth/user-not-found':
+          return 'Email não cadastrado';
+        default: return 'Erro ao enviar email de recuperação.';
+      }
     }
   },
 
