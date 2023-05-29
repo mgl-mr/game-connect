@@ -111,7 +111,7 @@ export default {
     }
   },
 
-  async fetchJogos({ commit }) {
+  async fetchGames({ commit }) {
     try {
       const gamesRef = ref(database, 'jogos');
       const snapshot = await get(gamesRef);
@@ -122,7 +122,7 @@ export default {
 
       commit('setGames', gamesArray);
     } catch (error) {
-      console.error(`actions, fetchJogos: ${error}`);
+      console.error(`actions, fetchGames: ${error}`);
     }
   },
 };

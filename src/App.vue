@@ -8,7 +8,7 @@ export default {
 
   async mounted() {
     if (this.$store.state.games.length === 0) {
-      await this.$store.dispatch('fetchJogos');
+      await this.$store.dispatch('fetchGames');
     }
   },
 };
