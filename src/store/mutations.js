@@ -6,4 +6,8 @@ export default {
   setUserSignup(state, user) {
     state.userSignup = { ...state.userSignup, ...user };
   },
+
+  setGames(state, games) {
+    state.games = games;
+  },
 };
