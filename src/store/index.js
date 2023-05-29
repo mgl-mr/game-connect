@@ -7,6 +7,7 @@ import getters from './getters';
 export default createStore({
   state: {
     user: {},
+    games: [],
     userSignup: {
       name: '',
       email: '',
@@ -19,6 +20,7 @@ export default createStore({
       image: '',
       imageName: '',
       urlImage: '',
+      games: [],
     },
   },
   getters,
