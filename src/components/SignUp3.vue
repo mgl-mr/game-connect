@@ -103,6 +103,10 @@ export default {
       }
     },
 
+    back() {
+      this.$router.push('/sign-up/sign-up2');
+    },
+
     validate() {
       if (this.start === '' || this.end === '') {
         this.msg = 'Preencha estes campos!';
@@ -123,6 +127,42 @@ export default {
         this.startError = true;
         setTimeout(() => {
           this.startError = false;
+        }, 500);
+        return false;
+      }
+
+      if (!regex.test(this.end)) {
+        this.msg = 'Digite um horário válido!';
+        this.error = true;
+        this.endError = true;
+        setTimeout(() => {
+          this.endError = false;
+        }, 500);
+        return false;
+      }
+
+      return true;
+    },
+
+    validateImage(file) {
+      const allowedTypes = ['image/jpeg', 'image/png'];
+
+      if (!allowedTypes.includes(file.type)) {
+        this.msg = 'Somente arquivo do tipo jpeg ou png!';
+        this.error = true;
+        this.imageError = true;
+        setTimeout(() => {
+          this.imageError = false;
+        }, 500);
+        return false;
+      }
+
+      if (file.size > 1024 * 1024) {
+        this.msg = 'imagem até 1MB!';
+        this.error = true;
+        this.imageError = true;
+        setTimeout(() => {
+          this.imageError = false;
         }, 500);
         return false;
       }
@@ -166,36 +206,17 @@ export default {
 
     pickImage(e) {
       const file = e.target.files[0];
-      const allowedTypes = ['image/jpeg', 'image/png'];
 
-      if (!allowedTypes.includes(file.type)) {
-        this.msg = 'Somente arquivo do tipo jpeg ou png!';
-        this.error = true;
-        this.imageError = true;
-        setTimeout(() => {
-          this.imageError = false;
-        }, 500);
-        return false;
+      if (this.validateImage(file)) {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          this.urlImage = reader.result;
+        };
+
+        this.imageName = `: ${file.name}`;
+        this.image = file;
       }
-
-      if (file.size > 1024 * 1024) {
-        this.msg = 'imagem até 1MB!';
-        this.error = true;
-        this.imageError = true;
-        setTimeout(() => {
-          this.imageError = false;
-        }, 500);
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        this.urlImage = reader.result;
-      };
-
-      this.imageName = `: ${file.name}`;
-      this.image = file;
     },
   },
 
@@ -205,6 +226,10 @@ export default {
     this.image = this.$store.state.userSignup.image;
     this.imageName = this.$store.state.userSignup.imageName;
     this.urlImage = this.$store.state.userSignup.urlImage;
+
+    if (this.$route.query.toValidate) {
+      this.validate();
+    }
   },
 
   unmounted() {
