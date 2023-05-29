@@ -176,6 +176,10 @@ export default {
     this.email = this.$store.state.userSignup.email;
     this.password = this.$store.state.userSignup.password;
     this.confirm = this.$store.state.userSignup.confirm;
+
+    if (this.$route.query.toValidate) {
+      this.validate();
+    }
   },
 
   unmounted() {
