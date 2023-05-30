@@ -71,7 +71,7 @@ export default {
         this.loading = false;
 
         if (login === true) {
-          // TODO: ir para home
+          this.$router.push('/home');
         } else {
           this.msg = login;
           this.error = true;
