@@ -107,12 +107,14 @@ export default {
       const credentials = this.$store.state.userSignup;
 
       let regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const regex2 = /^[a-zA-Z0-9\s]+$/;
       if (
         credentials.name === ''
         || credentials.email === ''
         || credentials.password === ''
         || credentials.confirm === ''
         || (credentials.name.length < 3 || credentials.password.length > 30)
+        || !regex2.test(credentials.name)
         || !regex.test(credentials.email)
         || credentials.password.length < 6 || credentials.password.length > 15
         || credentials.password !== credentials.confirm

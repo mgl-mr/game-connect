@@ -132,8 +132,18 @@ export default {
         }, 500);
         return false;
       }
+      let regex = /^[a-zA-Z0-9\s]+$/;
+      if (!regex.test(this.name)) {
+        this.msg = 'Nome só pode conter letras e números!';
+        this.error = true;
+        this.nameError = true;
+        setTimeout(() => {
+          this.nameError = false;
+        }, 500);
+        return false;
+      }
 
-      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!regex.test(this.email)) {
         this.msg = 'Digite um email válido!';
         this.error = true;
