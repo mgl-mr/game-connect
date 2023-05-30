@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
+import store from '@/store';
 import SignIn from '@/components/SignIn.vue';
 import SignUp from '@/components/SignUp.vue';
 import SignUp1 from '@/components/SignUp1.vue';
@@ -7,6 +8,7 @@ import SignUp3 from '@/components/SignUp3.vue';
 import SignUp4 from '@/components/SignUp4.vue';
 import ForgotPass from '@/components/ForgotPass.vue';
 import Authentication from '@/views/Authentication.vue';
+import Home from '@/views/Home.vue';
 
 const routes = [
   {
@@ -48,11 +50,25 @@ const routes = [
       },
     ],
   },
+  {
+    path: '/home',
+    name: 'home',
+    component: Home,
+  },
 ];
 
 const router = createRouter({
   history: createWebHashHistory(),
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  const { user } = store.state;
+  if (to.name === 'home' && Object.keys(user).length === 0) {
+    next({ name: 'authentication' });
+  } else {
+    next();
+  }
 });
 
 export default router;
