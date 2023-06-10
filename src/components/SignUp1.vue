@@ -123,7 +123,7 @@ export default {
         return false;
       }
 
-      if (this.name.length < 3 || this.password.length > 30) {
+      if (this.name.length < 3 || this.name.length > 30) {
         this.msg = 'Nome deve ter entre 3 a 30 caracteres!';
         this.error = true;
         this.nameError = true;
