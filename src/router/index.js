@@ -8,7 +8,7 @@ import SignUp3 from '@/components/SignUp3.vue';
 import SignUp4 from '@/components/SignUp4.vue';
 import ForgotPass from '@/components/ForgotPass.vue';
 import Authentication from '@/views/Authentication.vue';
-import Home from '@/views/Home.vue';
+import Application from '@/views/Application.vue';
 
 const routes = [
   {
@@ -51,9 +51,9 @@ const routes = [
     ],
   },
   {
-    path: '/home',
-    name: 'home',
-    component: Home,
+    path: '/application',
+    name: 'application',
+    component: Application,
   },
 ];
 
@@ -64,7 +64,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const { user } = store.state;
-  if (to.name === 'home' && Object.keys(user).length === 0) {
+  if (to.name === 'application' && Object.keys(user).length === 0) {
     next({ name: 'authentication' });
   } else {
     next();

@@ -71,7 +71,7 @@ export default {
         this.loading = false;
 
         if (login === true) {
-          this.$router.push('/home');
+          this.$router.push('/application');
         } else {
           this.msg = login;
           this.error = true;
