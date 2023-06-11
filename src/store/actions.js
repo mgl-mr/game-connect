@@ -79,6 +79,7 @@ export default {
         end: userData.end,
         imageURL: downloadURL,
         games: userData.games,
+        friends: [],
       });
 
       sendEmailVerification(userAuth.user);
