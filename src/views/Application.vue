@@ -1,12 +1,15 @@
 <template>
   <div class="container-screen">
-    <p>Novas features em breve!!!!</p>
+    <Sidebar />
   </div>
 </template>
 
 <script>
+import Sidebar from '@/components/Sidebar.vue';
+
 export default {
   name: 'Application',
+  components: { Sidebar },
 };
 </script>
 
