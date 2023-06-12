@@ -13,9 +13,13 @@ import {
 } from 'firebase/auth';
 
 import {
+  collection,
   doc,
   getDoc,
   setDoc,
+  onSnapshot,
+  query,
+  where,
 } from 'firebase/firestore';
 
 import {
@@ -127,5 +131,28 @@ export default {
         default: return 'Erro ao enviar email de recuperação.';
       }
     }
+  },
+
+  fetchFriends({ commit }, friendsId) {
+    const friendsRef = collection(database, 'gamers');
+    const friendsQuery = query(friendsRef, where('__name__', 'in', friendsId));
+    onSnapshot(friendsQuery, (querySnapshot) => {
+      const friends = [];
+      querySnapshot.forEach((document) => {
+        friends.push({
+          id: document.id,
+          name: document.data().name,
+          bio: document.data().bio,
+          birthdate: document.data().birthdate,
+          start: document.data().start,
+          end: document.data().end,
+          imageURL: document.data().imageURL,
+          games: document.data().games,
+        });
+      });
+      commit('setUser', {
+        friends,
+      });
+    });
   },
 };

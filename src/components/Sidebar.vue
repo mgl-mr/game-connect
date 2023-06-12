@@ -18,7 +18,7 @@
         alt="Imagem de perfil"
       >
 
-      <p class="user-name">Miguel Morales Rodrigues</p>
+      <p class="user-name">{{ $store.state.user.name }}</p>
     </div>
 
     <input
@@ -29,15 +29,33 @@
     >
 
     <div class="friends">
-      <p v-if="friends === false" class="friend-message">
+      <p v-if="$store.state.user.friendsId.length === 0" class="friend-message">
         Você ainda não tem amigos adicionados.
       </p>
       <p v-else-if="friends.length === 0" class="friend-message">
         Não há amigos correspondente à sua busca.
       </p>
       <div
+        v-else-if="searchTerm !== ''"
+        v-for="(friend, id) in $store.state.user.friends" :key="id"
+        class="friend"
+        @click="showPerfil(friend)"
+      >
+        <img v-if="friend.imageURL !== ''"
+        :src="friend.imageURL"
+        class="friend-image"
+        alt="Imagem de perfil"
+        >
+        <img v-else
+          src="@/assets/images/user-no-image.png"
+          class="friend-image"
+          alt="Imagem de perfil"
+        >
+        <p class="friend-name">{{ friend.name }}</p>
+      </div>
+      <div
         v-else
-        v-for="(friend, id) in friends" :key="id"
+        v-for="(friend, index) in $store.state.user.friends" :key="index"
         class="friend"
         @click="showPerfil(friend)"
       >
@@ -58,25 +76,19 @@
 </template>
 
 <script>
+
 export default {
   name: 'Sidebar',
 
   data() {
     return {
       friends: false,
+      filteredFriends: false,
       searchTerm: '',
     };
   },
 
   methods: {
-    loadFriends() {
-      if (this.$store.state.user.friends.length !== 0) {
-        this.friends = this.$store.state.user.friends;
-      } else {
-        this.friends = false;
-      }
-    },
-
     // eslint-disable-next-line no-unused-vars
     showPerfil(friend) {
       // TODO: ir para página de perfil do usuário
@@ -86,17 +98,17 @@ export default {
   watch: {
     searchTerm() {
       if (this.searchTerm === '') {
-        this.loadFriends();
+        if (this.$store.state.user.friendsId.length !== 0) {
+          this.friends = this.$store.state.user.friends;
+        } else {
+          this.friends = false;
+        }
       } else {
         this.friends = this.$store.state.user.friends.filter(
           (friend) => friend.name.toLowerCase().includes(this.searchTerm.toLowerCase()),
         );
       }
     },
-  },
-
-  mounted() {
-    this.loadFriends();
   },
 };
 </script>

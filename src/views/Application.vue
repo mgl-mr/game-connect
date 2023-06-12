@@ -10,6 +10,12 @@ import Sidebar from '@/components/Sidebar.vue';
 export default {
   name: 'Application',
   components: { Sidebar },
+
+  async mounted() {
+    if (this.$store.state.user.friendsId.length !== 0) {
+      await this.$store.dispatch('fetchFriends', this.$store.state.user.friendsId);
+    }
+  },
 };
 </script>
 
