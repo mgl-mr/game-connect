@@ -4,10 +4,12 @@ import actions from './actions';
 import mutations from './mutations';
 import getters from './getters';
 
+import games from '../assets/data/games.json';
+
 export default createStore({
   state: {
     user: {},
-    games: [],
+    games,
     userSignup: {
       name: '',
       email: '',

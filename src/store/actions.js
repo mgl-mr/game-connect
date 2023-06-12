@@ -13,10 +13,8 @@ import {
 } from 'firebase/auth';
 
 import {
-  collection,
   doc,
   getDoc,
-  getDocs,
   setDoc,
 } from 'firebase/firestore';
 
@@ -128,22 +126,6 @@ export default {
           return 'Email não cadastrado';
         default: return 'Erro ao enviar email de recuperação.';
       }
-    }
-  },
-
-  async fetchGames({ commit }) {
-    try {
-      const gamesRef = collection(database, 'games');
-      const snapshot = await getDocs(gamesRef);
-      const gamesArray = [];
-      snapshot.forEach((document) => {
-        const data = document.data();
-        data.id = document.id;
-        gamesArray.push(data);
-      });
-      commit('setGames', gamesArray);
-    } catch (error) {
-      console.error(`actions, fetchGames: ${error}`);
     }
   },
 };
