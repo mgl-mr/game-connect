@@ -41,6 +41,7 @@ export default {
         if (userDoc.exists()) {
           const user = userDoc.data();
           user.id = userDoc.id;
+          user.friends = [];
           commit('setUser', user);
           return true;
         }
@@ -82,7 +83,7 @@ export default {
         end: userData.end,
         imageURL: downloadURL,
         games: userData.games,
-        friends: [],
+        friendsId: [],
       });
 
       sendEmailVerification(userAuth.user);
