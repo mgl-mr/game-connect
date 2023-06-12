@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getDatabase } from 'firebase/database';
+import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
 
@@ -13,6 +13,6 @@ const firebaseApp = initializeApp({
   appId: process.env.VUE_APP_APP_ID,
 });
 
-export const database = getDatabase(firebaseApp);
+export const database = getFirestore(firebaseApp);
 export const auth = getAuth(firebaseApp);
 export const storage = getStorage(firebaseApp);

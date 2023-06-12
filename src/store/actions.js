@@ -13,10 +13,12 @@ import {
 } from 'firebase/auth';
 
 import {
-  ref,
-  get,
-  set,
-} from 'firebase/database';
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+} from 'firebase/firestore';
 
 import {
   ref as storageRef,
@@ -34,10 +36,11 @@ export default {
       );
 
       if (credentials.user.emailVerified) {
-        const userRef = ref(database, `gamers/${credentials.user.uid}`);
-        const snapshot = await get(userRef);
-        if (snapshot.exists()) {
-          const user = snapshot.val();
+        const userRef = doc(database, `gamers/${credentials.user.uid}`);
+        const userDoc = await getDoc(userRef);
+        if (userDoc.exists()) {
+          const user = userDoc.data();
+          user.id = userDoc.id;
           commit('setUser', user);
           return true;
         }
@@ -68,8 +71,8 @@ export default {
         downloadURL = await getDownloadURL(imageRef);
       }
 
-      const databaseRef = ref(database, `gamers/${userAuth.user.uid}`);
-      await set(databaseRef, {
+      const databaseRef = doc(database, `gamers/${userAuth.user.uid}`);
+      await setDoc(databaseRef, {
         name: userData.name,
         email: userData.email,
         password: userData.password,
@@ -129,13 +132,14 @@ export default {
 
   async fetchGames({ commit }) {
     try {
-      const gamesRef = ref(database, 'jogos');
-      const snapshot = await get(gamesRef);
-      const gamesArray = Object.entries(snapshot.val()).map(([id, game]) => {
-        game.id = id;
-        return game;
+      const gamesRef = collection(database, 'games');
+      const snapshot = await getDocs(gamesRef);
+      const gamesArray = [];
+      snapshot.forEach((document) => {
+        const data = document.data();
+        data.id = document.id;
+        gamesArray.push(data);
       });
-
       commit('setGames', gamesArray);
     } catch (error) {
       console.error(`actions, fetchGames: ${error}`);

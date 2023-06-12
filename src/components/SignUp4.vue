@@ -4,7 +4,7 @@
       <p>Selecione seu jogos favoritos(opcional):</p>
       <div class="games">
         <div v-for="(game, id) in $store.state.userSignup.games" :key="id">
-          <img :src="game.urlFoto" @click="removeGame(game)" :alt="game.nome">
+          <img :src="game.imageURL" @click="removeGame(game)" :alt="game.name">
         </div>
         <div v-for="index in numberOfDivs" :key="index"></div>
       </div>

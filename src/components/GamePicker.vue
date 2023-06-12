@@ -9,12 +9,12 @@
     <ul id="game-list">
       <li v-for="(game, id) in visibleGames" :key="id">
         <img
-          :src="game.urlFoto"
+          :src="game.imageURL"
           class="image"
           :class="{'selected' : selected(game) || isFull()}"
-          :alt="game.nome"
+          :alt="game.name"
           @click="pick(game)"
-          @mouseover="hover = game.nome"
+          @mouseover="hover = game.name"
           @mouseleave="hover = ''"
         >
       </li>
@@ -58,7 +58,7 @@ export default {
       } else {
         this.visibleGames = [];
         this.games = this.$store.state.games.filter(
-          (game) => game.nome.toLowerCase().includes(this.searchTerm.toLowerCase()),
+          (game) => game.name.toLowerCase().includes(this.searchTerm.toLowerCase()),
         );
       }
       this.loadMoreItems();
