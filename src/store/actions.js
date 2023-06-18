@@ -20,6 +20,7 @@ import {
   onSnapshot,
   query,
   where,
+  getDocs,
 } from 'firebase/firestore';
 
 import {
@@ -154,5 +155,20 @@ export default {
         friends,
       });
     });
+  },
+
+  async fetchGames({ commit }) {
+    try {
+      const gamesRef = collection(database, 'games');
+      const snapshot = await getDocs(gamesRef);
+      const gamesArray = snapshot.docs.map((document) => ({
+        id: document.id,
+        ...document.data(),
+      }));
+      console.log(gamesArray);
+      commit('setGames', gamesArray);
+    } catch (error) {
+      console.error(`actions, fetchGames: ${error}`);
+    }
   },
 };
