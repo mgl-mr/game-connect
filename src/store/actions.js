@@ -67,7 +67,7 @@ export default {
       );
 
       if (userData.image !== '') {
-        const imageName = userData.name.replace(/\s/g, '').substring(0, 3) + userAuth.user.uid.substring(0, 10);
+        const imageName = userData.email.replace(/\s/g, '').substring(0, 3) + userAuth.user.uid.substring(0, 10);
         const imageRef = storageRef(storage, `/${imageName}`);
 
         await uploadBytes(imageRef, userData.image);
