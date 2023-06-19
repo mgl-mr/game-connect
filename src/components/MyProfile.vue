@@ -65,6 +65,36 @@
           placeholder="Confirmar senha"
         >
       </div>
+      <div class="container-input birthdate">
+        <p>Data de nascimento</p>
+        <input
+          type="text"
+          class="input"
+          placeholder="dd/mm/yyyy"
+        >
+      </div>
+
+      <div class="container-input playtime">
+        <p>Horário do dia que mais joga</p>
+        <div class="time-input-container">
+          <div>
+            <span>Inicio:</span>
+            <input
+              type="text"
+              class="input"
+              placeholder="00:00"
+            >
+          </div>
+          <div>
+            <span>Fim:</span>
+            <input
+              type="text"
+              class="input"
+              placeholder="00:00"
+            >
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -268,19 +298,48 @@ export default {
   cursor: pointer;
 }
 
-/*** PASSWORD ***/
+/*** PASSWORD ***/ /*** BIRTHDATE ***/ /*** PLAYTIME ***/
 .password {
   height: 20vh;
+  margin-bottom: 10px;
 }
 
-.password > p {
+.birthdate,
+.playtime {
+  height: 10vh;
+  margin-bottom: 10px;
+}
+
+.time-input-container {
+  display: flex;
+  width: 100%;
+}
+
+.time-input-container div{
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 50%;
+  margin-top: 5px;
+}
+
+.password > p,
+.birthdate > p,
+.playtime > p,
+.time-input-container span {
   margin: 1vh;
   font-size: 0.7rem;
   color: var(--white);
   font-family: var(--pressStart), Arial, Helvetica;
 }
 
-.password .input {
+.time-input-container span {
+  margin-left: 1vh;
+}
+
+.password .input,
+.birthdate .input,
+.time-input-container .input {
   width: calc(100% - 1vh);
   margin-left: 1vh;
   margin-bottom: 1vh;
@@ -288,21 +347,35 @@ export default {
   border-bottom: 1px solid var(--white);
 }
 
-.password .input:hover {
+.time-input-container .input {
+  width: 35px;
+  height: auto;
+  margin: 0;
+}
+
+.password .input:hover,
+.birthdate .input:hover,
+.time-input-container .input:hover {
   color: var(--accent);
   border-color: var(--accent);
 }
 
-.password .input:hover::placeholder {
+.password .input:hover::placeholder,
+.birthdate .input:hover::placeholder,
+.time-input-container .input:hover::placeholder {
   color: var(--accent);
 }
 
-.password .input:focus {
+.password .input:focus,
+.birthdate .input:focus,
+.time-input-container .input:focus {
   color: var(--accent);
   border-color: var(--accent);
 }
 
-.password .input:focus::placeholder {
+.password .input:focus::placeholder,
+.birthdate .input:focus::placeholder,
+.time-input-container .input:focus::placeholder {
   color: var(--accent);
 }
 </style>
