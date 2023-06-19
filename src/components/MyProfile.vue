@@ -47,6 +47,24 @@
       />
     </div>
     <div class="container-right">
+      <div class="container-input password">
+        <p>Alterar senha</p>
+        <input
+          type="password"
+          class="input"
+          placeholder="Senha atual"
+        >
+        <input
+          type="password"
+          class="input"
+          placeholder="Nova senha"
+        >
+        <input
+          type="password"
+          class="input"
+          placeholder="Confirmar senha"
+        >
+      </div>
     </div>
   </div>
 </template>
@@ -111,7 +129,6 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   height: 83vh;
 }
 
@@ -121,14 +138,13 @@ export default {
 
 .container-right {
   width: 40%;
-  background-color: brown;
 }
 
 .container-input {
   width: calc(100% - 2px);
   border: 1px solid var(--accent);
   border-radius: 10px;
-  background: linear-gradient(99.83deg, #B946FF 0%, #000000 100%);
+  background: linear-gradient(99.83deg, var(--primary) 0%, var(--dark) 100%);
 }
 
 .input {
@@ -250,5 +266,43 @@ export default {
 
 .games img:hover {
   cursor: pointer;
+}
+
+/*** PASSWORD ***/
+.password {
+  height: 20vh;
+}
+
+.password > p {
+  margin: 1vh;
+  font-size: 0.7rem;
+  color: var(--white);
+  font-family: var(--pressStart), Arial, Helvetica;
+}
+
+.password .input {
+  width: calc(100% - 1vh);
+  margin-left: 1vh;
+  margin-bottom: 1vh;
+  height: 4vh;
+  border-bottom: 1px solid var(--white);
+}
+
+.password .input:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.password .input:hover::placeholder {
+  color: var(--accent);
+}
+
+.password .input:focus {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.password .input:focus::placeholder {
+  color: var(--accent);
 }
 </style>
