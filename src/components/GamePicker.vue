@@ -106,10 +106,10 @@ export default {
   flex-direction: column;
   position: relative;
   align-items: center;
-  width: 60%;
+  width: 100%;
   height: 40vh;
   background-color: var(--dark);
-  margin: 20px 0 0 0;
+  margin: 0;
   border-radius: 20px;
 }
 
