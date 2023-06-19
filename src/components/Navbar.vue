@@ -29,7 +29,7 @@ export default {
   align-items: center;
   justify-content: space-around;
   width: 100%;
-  height: calc(15vh -5px);
+  height: calc(15vh - 5px);
 
   border-bottom: 5px solid var(--primary);
 }
