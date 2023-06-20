@@ -113,7 +113,7 @@ export default {
         || credentials.email === ''
         || credentials.password === ''
         || credentials.confirm === ''
-        || (credentials.name.length < 3 || credentials.password.length > 30)
+        || (credentials.name.length < 3 || credentials.name.length > 30)
         || !regex2.test(credentials.name)
         || !regex.test(credentials.email)
         || credentials.password.length < 6 || credentials.password.length > 15
