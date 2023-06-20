@@ -17,6 +17,7 @@ import {
   doc,
   getDoc,
   setDoc,
+  updateDoc,
   onSnapshot,
   query,
   where,
@@ -157,6 +158,26 @@ export default {
     });
   },
 
+  async updateImage({ commit }, payload) {
+    const user = payload[0];
+    const file = payload[1];
+
+    const imageName = user.email.replace(/\s/g, '').substring(0, 3) + user.id.substring(0, 10);
+    const imageRef = storageRef(storage, `/${imageName}`);
+
+    await uploadBytes(imageRef, file);
+    const imageURL = await getDownloadURL(imageRef);
+
+    const databaseRef = doc(database, `gamers/${user.id}`);
+    await updateDoc(databaseRef, {
+      imageURL,
+    });
+
+    commit('setUser', {
+      imageURL,
+    });
+  },
+
   async fetchGames({ commit }) {
     try {
       const gamesRef = collection(database, 'games');
@@ -165,7 +186,6 @@ export default {
         id: document.id,
         ...document.data(),
       }));
-      console.log(gamesArray);
       commit('setGames', gamesArray);
     } catch (error) {
       console.error(`actions, fetchGames: ${error}`);

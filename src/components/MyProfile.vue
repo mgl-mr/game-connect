@@ -7,8 +7,13 @@
             v-show="false"
             type="file"
             id="image"
+            @change="pickImage"
           >
-          <img :src="user.imageURL" alt="imagem de perfil">
+          <img
+            :src="user.imageURL"
+            alt="imagem de perfil"
+            :class="{ 'input-error': imageError }"
+          >
           <img
             src="@/assets/images/pick_image.png"
             alt="imagem de perfil"
@@ -71,6 +76,7 @@
           type="text"
           class="input"
           placeholder="dd/mm/yyyy"
+          v-model="user.birthdate"
         >
       </div>
 
@@ -83,6 +89,7 @@
               type="text"
               class="input"
               placeholder="00:00"
+              v-model="user.start"
             >
           </div>
           <div>
@@ -91,9 +98,14 @@
               type="text"
               class="input"
               placeholder="00:00"
+              v-model="user.end"
             >
           </div>
         </div>
+      </div>
+
+      <div class="div-error">
+        <p class="auth-error" :class="{'error':error}">{{ msg }}</p>
       </div>
 
       <div class="button-save">
@@ -121,6 +133,9 @@ export default {
       user: null,
       saving: false,
       deleting: false,
+      msg: '',
+      error: false,
+      imageError: '',
     };
   },
 
@@ -149,6 +164,38 @@ export default {
       if (index !== -1) {
         this.user.games.splice(index, 1);
       }
+    },
+
+    async pickImage(e) {
+      const file = e.target.files[0];
+      const allowedTypes = ['image/jpeg', 'image/png'];
+
+      if (!allowedTypes.includes(file.type)) {
+        this.msg = 'Somente arquivo do tipo jpeg ou png!';
+        this.error = true;
+        this.imageError = true;
+        setTimeout(() => {
+          this.imageError = false;
+        }, 500);
+        return false;
+      }
+
+      if (file.size > 1024 * 1024) {
+        this.msg = 'imagem até 1MB!';
+        this.error = true;
+        this.imageError = true;
+        setTimeout(() => {
+          this.imageError = false;
+        }, 500);
+        return false;
+      }
+      this.saving = true;
+      await this.$store.dispatch(
+        'updateImage',
+        [this.user, file],
+      );
+      this.saving = false;
+      this.user.imageURL = this.$store.state.user.imageURL;
     },
   },
 
@@ -391,7 +438,7 @@ export default {
   color: var(--accent);
 }
 
-/*** SAVE BUTTON ***/
+/*** BUTTONS ***/
 .button-save,
 .button-delete {
   overflow: hidden;
@@ -463,5 +510,48 @@ export default {
 
 .delete:hover {
   text-shadow: 2px 4px 2px var(--primary);
+}
+
+.loading{
+  display: block;
+  animation: loading 2s linear infinite;
+}
+
+@keyframes loading {
+  0% { left: -15%; }
+  50% { left: 85%; }
+  100% { left: -15%; }
+}
+
+/*** ERROR ***/
+.div-error {
+  height: 4vh;
+  margin: 0;
+  text-align: center;
+}
+
+.auth-error {
+  display: none;
+  margin: 0;
+  font-size: 1.5vw;
+  color: var(--white);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.error {
+  display: block;
+}
+
+.input-error {
+  border-color: red;
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  50% { transform: translateX(10px); }
+  75% { transform: translateX(-10px); }
+  100% { transform: translateX(0); }
 }
 </style>
