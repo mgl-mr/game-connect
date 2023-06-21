@@ -10,6 +10,7 @@ import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
   sendPasswordResetEmail,
+  updatePassword,
 } from 'firebase/auth';
 
 import {
@@ -156,6 +157,31 @@ export default {
         friends,
       });
     });
+  },
+
+  async updateUser({ commit }, user) {
+    const {
+      pass,
+      newPass,
+      confirmPass,
+      ...userUpdate
+    } = user;
+
+    try {
+      if (newPass !== '') {
+        await updatePassword(auth.currentUser, newPass);
+        userUpdate.password = newPass;
+      }
+
+      const databaseRef = doc(database, `gamers/${user.id}`);
+      await updateDoc(databaseRef, userUpdate);
+
+      commit('setUser', userUpdate);
+
+      return true;
+    } catch (error) {
+      return false;
+    }
   },
 
   async updateImage({ commit }, payload) {

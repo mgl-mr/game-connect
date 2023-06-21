@@ -58,16 +58,19 @@
           type="password"
           class="input"
           placeholder="Senha atual"
+          v-model="user.pass"
         >
         <input
           type="password"
           class="input"
           placeholder="Nova senha"
+          v-model="user.newPass"
         >
         <input
           type="password"
           class="input"
           placeholder="Confirmar senha"
+          v-model="user.confirmPass"
         >
       </div>
       <div class="container-input birthdate">
@@ -105,12 +108,26 @@
       </div>
 
       <div class="div-error">
-        <p class="auth-error" :class="{'error':error}">{{ msg }}</p>
+        <p
+          class="auth-error"
+          :class="{
+            'error':error,
+            'input-error':msgError
+          }"
+        >
+          {{ msg }}
+        </p>
       </div>
 
       <div class="button-save">
         <div class="button-loading" :class="{'loading':saving}"></div>
-        <button type="submit" class="save">SALVAR</button>
+        <button
+          type="button"
+          class="save"
+          @click="update"
+        >
+          SALVAR
+        </button>
       </div>
 
       <div class="button-delete">
@@ -134,8 +151,9 @@ export default {
       saving: false,
       deleting: false,
       msg: '',
+      msgError: false,
       error: false,
-      imageError: '',
+      imageError: false,
     };
   },
 
@@ -197,10 +215,112 @@ export default {
       this.saving = false;
       this.user.imageURL = this.$store.state.user.imageURL;
     },
+
+    async update() {
+      if (this.validate()) {
+        this.saving = true;
+        const update = await this.$store.dispatch(
+          'updateUser',
+          this.user,
+        );
+        this.saving = false;
+
+        if (update) {
+          this.msg = 'Dados atualizados com sucesso';
+          this.error = true;
+          if (this.user.pass !== '') {
+            this.user.pass = '';
+            this.user.newPass = '';
+            this.user.confirmPass = '';
+          }
+        } else {
+          this.informError('Erro ao atualizar dados.');
+        }
+      }
+    },
+
+    validate() {
+      if (this.user.name === '') {
+        this.informError('Informe o seu nome!');
+        return false;
+      }
+
+      if (this.user.name.length < 3 || this.user.name.length > 30) {
+        this.informError('Nome entre 3 a 30 caracteres!');
+        return false;
+      }
+
+      let regex = /^[a-zA-Z0-9\s]+$/;
+      if (!regex.test(this.user.name)) {
+        this.informError('Nome só pode conter letras e números!');
+        return false;
+      }
+
+      if (this.user.bio.length > 150) {
+        this.informError('Desrição até 150 caracterres!');
+        return false;
+      }
+
+      if (this.user.pass !== '') {
+        if (this.user.pass !== this.user.password) {
+          this.informError('Senha incorreta!');
+          return false;
+        }
+        if (this.user.newPass.length < 6 || this.user.newPass.length > 15) {
+          this.informError('Nova senha entre 6 a 15 caracteres!');
+          return false;
+        }
+        if (this.user.newPass !== this.user.confirmPass) {
+          this.informError('Senhas diferentes!');
+          return false;
+        }
+      }
+
+      regex = /^(0[1-9]|1\d|2\d|3[01])\/(0[1-9]|1[0-2])\/(\d{4})$/;
+      if (!regex.test(this.user.birthdate)) {
+        this.informError('insira uma data válida! (DD/MM/YYYY)');
+        return false;
+      }
+
+      if (this.user.start === '') {
+        this.informError('Informe o horário de inicio!');
+        return false;
+      }
+
+      if (this.user.end === '') {
+        this.informError('Informe o horário de fim!');
+        return false;
+      }
+
+      regex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
+      if (!regex.test(this.user.start)) {
+        this.informError('Informe o horário de inicio valido! (HH:MM)');
+        return false;
+      }
+
+      if (!regex.test(this.user.end)) {
+        this.informError('Informe o horário de fim valido! (HH:MM)');
+        return false;
+      }
+
+      return true;
+    },
+
+    informError(message) {
+      this.msg = message;
+      this.error = true;
+      this.msgError = true;
+      setTimeout(() => {
+        this.msgError = false;
+      }, 500);
+    },
   },
 
   beforeMount() {
     this.user = { ...this.$store.state.user };
+    this.user.pass = '';
+    this.user.newPass = '';
+    this.user.confirmPass = '';
   },
 };
 
@@ -543,7 +663,7 @@ export default {
 }
 
 .input-error {
-  border-color: red;
+  color: var(--accent);
   animation: shake 0.5s;
 }
 
