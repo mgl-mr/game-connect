@@ -11,6 +11,7 @@ import {
   sendEmailVerification,
   sendPasswordResetEmail,
   updatePassword,
+  deleteUser,
 } from 'firebase/auth';
 
 import {
@@ -23,12 +24,14 @@ import {
   query,
   where,
   getDocs,
+  deleteDoc,
 } from 'firebase/firestore';
 
 import {
   ref as storageRef,
   uploadBytes,
   getDownloadURL,
+  deleteObject,
 } from 'firebase/storage';
 
 export default {
@@ -55,7 +58,6 @@ export default {
 
       return 'Você deve verificar o seu email.';
     } catch (error) {
-      console.log(error);
       return 'Email ou senha icorreto(s).';
     }
   },
@@ -177,6 +179,26 @@ export default {
       await updateDoc(databaseRef, userUpdate);
 
       commit('setUser', userUpdate);
+
+      return true;
+    } catch (error) {
+      return false;
+    }
+  },
+
+  async deleteUser({ commit }, user) {
+    try {
+      if (user.imageURL !== '') {
+        const imageName = user.email.replace(/\s/g, '').substring(0, 3) + user.id.substring(0, 10);
+        const imageRef = storageRef(storage, `/${imageName}`);
+        await deleteObject(imageRef);
+      }
+
+      const databaseRef = doc(database, `gamers/${user.id}`);
+      await deleteDoc(databaseRef, user);
+
+      await deleteUser(auth.currentUser);
+      commit('setUser', {});
 
       return true;
     } catch (error) {

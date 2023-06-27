@@ -132,18 +132,31 @@
 
       <div class="button-delete">
         <div class="button-loading" :class="{'loading':deleting}"></div>
-        <button type="submit" class="delete">DELETAR</button>
+        <button
+          type="button"
+          class="delete"
+          @click="showModal = true"
+        >
+          DELETAR
+        </button>
       </div>
     </div>
+    <ConfirmationModal
+      v-show="showModal"
+      message="Você está preste a deletar sua conta:"
+      @cancel="closeModal"
+      @confirm="destroy"
+    />
   </div>
 </template>
 
 <script>
 import GamePicker from './GamePicker.vue';
+import ConfirmationModal from './ConfirmationModal.vue';
 
 export default {
   name: 'MyProfile',
-  components: { GamePicker },
+  components: { GamePicker, ConfirmationModal },
 
   data() {
     return {
@@ -154,6 +167,7 @@ export default {
       msgError: false,
       error: false,
       imageError: false,
+      showModal: false,
     };
   },
 
@@ -237,6 +251,27 @@ export default {
           this.informError('Erro ao atualizar dados.');
         }
       }
+    },
+
+    async destroy() {
+      this.showModal = false;
+
+      this.deleting = true;
+      const deleted = await this.$store.dispatch(
+        'deleteUser',
+        this.user,
+      );
+      this.deleting = false;
+
+      if (deleted) {
+        this.$router.push('/sign-in');
+      } else {
+        this.informError('Erro ao deletar conta.');
+      }
+    },
+
+    closeModal() {
+      this.showModal = false;
     },
 
     validate() {
