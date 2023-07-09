@@ -13,6 +13,7 @@ import ForgotPass from '@/components/ForgotPass.vue';
 
 import Application from '@/views/Application.vue';
 import MyProfile from '@/components/MyProfile.vue';
+import Suggestions from '@/components/Suggestions.vue';
 
 const routes = [
   {
@@ -68,6 +69,11 @@ const routes = [
         path: '/my-profile',
         name: 'my-profile',
         component: MyProfile,
+      },
+      {
+        path: '/suggestions',
+        name: 'suggestions',
+        component: Suggestions,
       },
     ],
   },
