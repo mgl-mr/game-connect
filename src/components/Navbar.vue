@@ -1,12 +1,20 @@
 <template>
   <div class="container-nav">
     <router-link
-      to="/sign-in"
+      to="/my-profile"
       :class="{
         'auth-link-selected':checkRoute('/my-profile'),
         'auth-link':!checkRoute('/my-profile')}"
     >
       Meu perfil
+    </router-link>
+    <router-link
+      to="/suggestions"
+      :class="{
+        'auth-link-selected':checkRoute('/suggestions'),
+        'auth-link':!checkRoute('/suggestions')}"
+    >
+      Sugestões
     </router-link>
   </div>
 </template>
