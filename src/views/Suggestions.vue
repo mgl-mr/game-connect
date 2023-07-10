@@ -21,13 +21,15 @@
             <img
               :src="game.imageURL"
               :alt="game.name"
-              @mouseover="gameName = game.name"
+              @mouseover="gameName = game.name, hover = suggestion.id"
               @mouseleave="gameName = ''"
             >
           </div>
         </div>
         <div class="bottom">
-          <p class="game-name">{{ gameName }}</p>
+          <p v-show="suggestion.id === hover" class="game-name">
+            {{ gameName }}
+          </p>
           <button>SOLICITAR AMIZADE</button>
         </div>
       </div>
@@ -46,6 +48,7 @@ export default {
   data() {
     return {
       gameName: '',
+      hover: '',
       loading: false,
     };
   },
