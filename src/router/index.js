@@ -87,7 +87,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const { user } = store.state;
 
-  if (to.name === 'application' && Object.keys(user).length === 0) {
+  if (to.name.startsWith('application') && Object.keys(user).length === 0) {
     next({ name: 'authentication' });
   } else if (to.name === 'application') {
     next({ name: 'application-suggestions' });
