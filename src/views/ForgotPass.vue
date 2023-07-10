@@ -51,6 +51,7 @@ export default {
 
         if (response === true) {
           this.msg = 'Email de recuperação enviado com sucesso.';
+          this.email = '';
           this.error = true;
         } else {
           this.msg = response;
