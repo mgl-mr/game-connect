@@ -50,6 +50,7 @@ export default {
           const user = userDoc.data();
           user.id = userDoc.id;
           user.friends = [];
+          user.suggestions = [];
           commit('setUser', user);
           return true;
         }
@@ -79,6 +80,8 @@ export default {
         downloadURL = await getDownloadURL(imageRef);
       }
 
+      const gamesId = userData.games.map((game) => game.id);
+
       const databaseRef = doc(database, `gamers/${userAuth.user.uid}`);
       await setDoc(databaseRef, {
         name: userData.name,
@@ -91,6 +94,7 @@ export default {
         imageURL: downloadURL,
         games: userData.games,
         friendsId: [],
+        gamesId,
       });
 
       sendEmailVerification(userAuth.user);
@@ -138,34 +142,12 @@ export default {
     }
   },
 
-  fetchFriends({ commit }, friendsId) {
-    const friendsRef = collection(database, 'gamers');
-    const friendsQuery = query(friendsRef, where('__name__', 'in', friendsId));
-    onSnapshot(friendsQuery, (querySnapshot) => {
-      const friends = [];
-      querySnapshot.forEach((document) => {
-        friends.push({
-          id: document.id,
-          name: document.data().name,
-          bio: document.data().bio,
-          birthdate: document.data().birthdate,
-          start: document.data().start,
-          end: document.data().end,
-          imageURL: document.data().imageURL,
-          games: document.data().games,
-        });
-      });
-      commit('setUser', {
-        friends,
-      });
-    });
-  },
-
   async updateUser({ commit }, user) {
     const {
       pass,
       newPass,
       confirmPass,
+      id,
       ...userUpdate
     } = user;
 
@@ -224,6 +206,52 @@ export default {
     commit('setUser', {
       imageURL,
     });
+  },
+
+  fetchFriends({ commit }, friendsId) {
+    const friendsRef = collection(database, 'gamers');
+    const friendsQuery = query(friendsRef, where('__name__', 'in', friendsId));
+    onSnapshot(friendsQuery, (querySnapshot) => {
+      const friends = [];
+      querySnapshot.forEach((document) => {
+        friends.push({
+          id: document.id,
+          name: document.data().name,
+          bio: document.data().bio,
+          birthdate: document.data().birthdate,
+          start: document.data().start,
+          end: document.data().end,
+          imageURL: document.data().imageURL,
+          games: document.data().games,
+        });
+      });
+      commit('setUser', {
+        friends,
+      });
+    });
+  },
+
+  async fetchSuggestions({ commit }, ids) {
+    try {
+      const suggestionsRef = collection(database, 'gamers');
+      const suggestionsQuery = query(suggestionsRef, where('gamesId', 'array-contains-any', ids));
+      const snapshot = await getDocs(suggestionsQuery);
+      const suggestions = snapshot.docs.map((document) => ({
+        id: document.id,
+        name: document.data().name,
+        games: document.data().games,
+        bio: document.data().bio,
+        start: document.data().start,
+        end: document.data().end,
+        imageURL: document.data().imageURL,
+      }));
+
+      commit('setUser', {
+        suggestions,
+      });
+    } catch (error) {
+      console.error(`actions, fetchSuggestions: ${error}`);
+    }
   },
 
   async fetchGames({ commit }) {
