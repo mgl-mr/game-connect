@@ -266,7 +266,7 @@ export default {
       this.deleting = false;
 
       if (deleted) {
-        this.$router.push('/sign-in');
+        this.$router.push('/authentication/sign-in');
       } else {
         this.informError('Erro ao deletar conta.');
       }
