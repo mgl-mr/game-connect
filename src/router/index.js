@@ -3,17 +3,17 @@ import { createRouter, createWebHashHistory } from 'vue-router';
 import store from '@/store';
 
 import Authentication from '@/views/Authentication.vue';
-import SignIn from '@/components/SignIn.vue';
-import SignUp from '@/components/SignUp.vue';
-import SignUp1 from '@/components/SignUp1.vue';
-import SignUp2 from '@/components/SignUp2.vue';
-import SignUp3 from '@/components/SignUp3.vue';
-import SignUp4 from '@/components/SignUp4.vue';
-import ForgotPass from '@/components/ForgotPass.vue';
+import SignIn from '@/views/SignIn.vue';
+import SignUp from '@/views/SignUp.vue';
+import SignUp1 from '@/views/SignUp1.vue';
+import SignUp2 from '@/views/SignUp2.vue';
+import SignUp3 from '@/views/SignUp3.vue';
+import SignUp4 from '@/views/SignUp4.vue';
+import ForgotPass from '@/views/ForgotPass.vue';
 
 import Application from '@/views/Application.vue';
-import MyProfile from '@/components/MyProfile.vue';
-import Suggestions from '@/components/Suggestions.vue';
+import MyProfile from '@/views/MyProfile.vue';
+import Suggestions from '@/views/Suggestions.vue';
 
 const routes = [
   {

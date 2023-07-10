@@ -151,8 +151,8 @@
 </template>
 
 <script>
-import GamePicker from './GamePicker.vue';
-import ConfirmationModal from './ConfirmationModal.vue';
+import GamePicker from '@/components/GamePicker.vue';
+import ConfirmationModal from '@/components/ConfirmationModal.vue';
 
 export default {
   name: 'MyProfile',

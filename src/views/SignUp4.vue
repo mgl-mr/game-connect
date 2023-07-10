@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import GamePicker from './GamePicker.vue';
+import GamePicker from '@/components/GamePicker.vue';
 
 export default {
   name: 'SignUp4',

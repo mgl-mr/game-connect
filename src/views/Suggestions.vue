@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import Loading from './Loading.vue';
+import Loading from '@/components/Loading.vue';
 
 export default {
   name: 'Suggestions',
