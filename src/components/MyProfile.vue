@@ -233,6 +233,8 @@ export default {
     async update() {
       if (this.validate()) {
         this.saving = true;
+        const gamesId = this.user.games.map((game) => game.id);
+        this.user.gamesId = gamesId;
         const update = await this.$store.dispatch(
           'updateUser',
           this.user,
