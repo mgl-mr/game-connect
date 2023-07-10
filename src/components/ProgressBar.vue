@@ -1,38 +1,38 @@
 <template>
   <div class="line" :class="stage()">
       <router-link
-        to="/sign-up/sign-up1"
+        to="/authentication/sign-up/sign-up1"
         class="link complete"
-        :class="last('/sign-up/sign-up1')"
+        :class="last('/authentication/sign-up/sign-up1')"
       >
         1
       </router-link>
       <router-link
-        to="/sign-up/sign-up2"
+        to="/authentication/sign-up/sign-up2"
         class="link"
         :class="{
           'complete':signUp2complete,
-          'selected': last('/sign-up/sign-up2') !== false
+          'selected': last('/authentication/sign-up/sign-up2') !== false
         }"
       >
         2
       </router-link>
       <router-link
-        to="/sign-up/sign-up3"
+        to="/authentication/sign-up/sign-up3"
         class="link"
         :class="{
           'complete':signUp3complete,
-          'selected': last('/sign-up/sign-up3') !== false
+          'selected': last('/authentication/sign-up/sign-up3') !== false
         }"
       >
         3
       </router-link>
       <router-link
-        to="/sign-up/sign-up4"
+        to="/authentication/sign-up/sign-up4"
         class="link"
         :class="{
           'complete':signUp4complete,
-          'selected': last('/sign-up/sign-up4') !== false
+          'selected': last('/authentication/sign-up/sign-up4') !== false
         }"
       >
         4
@@ -47,21 +47,21 @@ export default {
   computed: {
     signUp2complete() {
       return (
-        this.$route.path === '/sign-up/sign-up2'
-        || this.$route.path === '/sign-up/sign-up3'
-        || this.$route.path === '/sign-up/sign-up4'
+        this.$route.path === '/authentication/sign-up/sign-up2'
+        || this.$route.path === '/authentication/sign-up/sign-up3'
+        || this.$route.path === '/authentication/sign-up/sign-up4'
       );
     },
 
     signUp3complete() {
       return (
-        this.$route.path === '/sign-up/sign-up3'
-        || this.$route.path === '/sign-up/sign-up4'
+        this.$route.path === '/authentication/sign-up/sign-up3'
+        || this.$route.path === '/authentication/sign-up/sign-up4'
       );
     },
 
     signUp4complete() {
-      return this.$route.path === '/sign-up/sign-up4';
+      return this.$route.path === '/authentication/sign-up/sign-up4';
     },
 
   },
@@ -69,13 +69,13 @@ export default {
   methods: {
     stage() {
       switch (this.$route.path) {
-        case '/sign-up/sign-up1':
+        case '/authentication/sign-up/sign-up1':
           return 'stage-1';
-        case '/sign-up/sign-up2':
+        case '/authentication/sign-up/sign-up2':
           return 'stage-2';
-        case '/sign-up/sign-up3':
+        case '/authentication/sign-up/sign-up3':
           return 'stage-3';
-        case '/sign-up/sign-up4':
+        case '/authentication/sign-up/sign-up4':
           return 'stage-4';
         default:
           break;

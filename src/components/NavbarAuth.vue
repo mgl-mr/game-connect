@@ -1,21 +1,21 @@
 <template>
   <div class="container-nav">
     <router-link
-      to="/sign-in"
+      to="/authentication/sign-in"
       :class="{'auth-link-selected':isSignInRoute, 'auth-link':!isSignInRoute}"
     >
       Login
     </router-link>
 
     <router-link
-      to="/sign-up"
+      to="/authentication/sign-up"
       :class="{'auth-link-selected':isSignUpRoute, 'auth-link':!isSignUpRoute}"
     >
       Registrar
     </router-link>
 
     <router-link
-      to="/forgot-pass"
+      to="/authentication/forgot-pass"
       :class="{'auth-link-selected':isForgotPassRoute, 'auth-link':!isForgotPassRoute}"
     >
       Recuperar Senha
@@ -29,18 +29,18 @@ export default {
 
   computed: {
     isSignInRoute() {
-      return this.$route.path === '/sign-in';
+      return this.$route.path === '/authentication/sign-in';
     },
     isSignUpRoute() {
       return (
-        this.$route.path === '/sign-up/sign-up1'
-        || this.$route.path === '/sign-up/sign-up2'
-        || this.$route.path === '/sign-up/sign-up3'
-        || this.$route.path === '/sign-up/sign-up4'
+        this.$route.path === '/authentication/sign-up/sign-up1'
+        || this.$route.path === '/authentication/sign-up/sign-up2'
+        || this.$route.path === '/authentication/sign-up/sign-up3'
+        || this.$route.path === '/authentication/sign-up/sign-up4'
       );
     },
     isForgotPassRoute() {
-      return this.$route.path === '/forgot-pass';
+      return this.$route.path === '/authentication/forgot-pass';
     },
   },
 };

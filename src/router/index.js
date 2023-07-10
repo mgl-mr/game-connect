@@ -22,13 +22,13 @@ const routes = [
     component: Authentication,
     children: [
       {
-        path: '/sign-in',
-        name: 'sign-in',
+        path: '/authentication/sign-in',
+        name: 'authentication-sign-in',
         component: SignIn,
       },
       {
-        path: '/sign-up',
-        name: 'sign-up',
+        path: '/authentication/sign-up',
+        name: 'authentication-sign-up',
         component: SignUp,
         children: [
           {
@@ -54,8 +54,8 @@ const routes = [
         ],
       },
       {
-        path: '/forgot-pass',
-        name: 'forgot-pass',
+        path: '/authentication/forgot-pass',
+        name: 'authentication-forgot-pass',
         component: ForgotPass,
       },
     ],
@@ -66,13 +66,13 @@ const routes = [
     component: Application,
     children: [
       {
-        path: '/my-profile',
-        name: 'my-profile',
+        path: '/application/my-profile',
+        name: 'application-my-profile',
         component: MyProfile,
       },
       {
-        path: '/suggestions',
-        name: 'suggestions',
+        path: '/application/suggestions',
+        name: 'application-suggestions',
         component: Suggestions,
       },
     ],
@@ -90,10 +90,10 @@ router.beforeEach((to, from, next) => {
   if (to.name === 'application' && Object.keys(user).length === 0) {
     next({ name: 'authentication' });
   } else if (to.name === 'application') {
-    next({ name: 'my-profile' });
+    next({ name: 'application-suggestions' });
   } else if (to.name === 'authentication') {
-    next({ name: 'sign-in' });
-  } else if (to.name === 'sign-up') {
+    next({ name: 'authentication-sign-in' });
+  } else if (to.name === 'authentication-sign-up') {
     next({ name: 'sign-up1' });
   } else {
     next();
