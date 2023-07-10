@@ -56,7 +56,7 @@ export default {
 
   methods: {
     back() {
-      this.$router.push('/sign-up/sign-up3');
+      this.$router.push('/authentication/sign-up/sign-up3');
     },
 
     pickGame(game) {
@@ -92,7 +92,7 @@ export default {
       this.loading = false;
       if (createUser === true) {
         this.$router.push({
-          path: '/sign-in',
+          path: '/authentication/sign-in',
           query: {
             verify: true,
           },

@@ -97,7 +97,7 @@ export default {
     next(e) {
       e.preventDefault();
       if (this.validate()) {
-        this.$router.push('/sign-up/sign-up2');
+        this.$router.push('/authentication/sign-up/sign-up2');
       }
     },
 

@@ -67,12 +67,12 @@ export default {
     next(e) {
       e.preventDefault();
       if (this.validate()) {
-        this.$router.push('/sign-up/sign-up3');
+        this.$router.push('/authentication/sign-up/sign-up3');
       }
     },
 
     back() {
-      this.$router.push('/sign-up/sign-up1');
+      this.$router.push('/authentication/sign-up/sign-up1');
     },
 
     validate() {
