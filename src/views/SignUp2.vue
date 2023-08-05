@@ -157,6 +157,7 @@ export default {
 }
 
 .bio {
+  height: auto;
   display: flex;
   align-items: flex-start;
   justify-content: center;
