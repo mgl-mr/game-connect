@@ -334,7 +334,7 @@ export default {
   border: 0;
   padding: 0;
   text-align: center;
-  background: var(--primary);
+  background: transparent;
   color: var(--white);
   border: 0;
   border-radius: 0px;
