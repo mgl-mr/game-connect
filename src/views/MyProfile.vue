@@ -604,17 +604,18 @@ export default {
   align-items: center;
   justify-content: center;
   width: calc(100% - 1vh);
-  height: 9vh;
   background: transparent;
   border-radius: 15px;
   margin-bottom: 1vh;
 }
 
 .button-save {
+  height: 9vh;
   border: 0.5vh solid var(--accent);
 }
 
 .button-delete {
+  height: 4.5vh;
   border: 0.5vh solid var(--dark);
 }
 
@@ -636,37 +637,35 @@ export default {
 .save,
 .delete {
   position: absolute;
-  width: calc(100% - 10px);
-  height: calc(100% - 10px);
   border: 0;
   border-radius: 10px;
   font-family: var(--pressStart);
-  font-size: 1.8vw;
   transition: font-size 0.2s ease-in-out;
 }
 
 .save {
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
   background-color: var(--accent);
   color: var(--primary);
+  font-size: 1.8vw;
 }
 
 .delete {
+  width: calc(100% - 5px);
+  height: calc(100% - 5px);
   background-color: var(--dark);
   color: var(--accent);
 }
 
 .save:hover,
 .delete:hover {
-  font-size: 2vw;
   cursor: pointer;
 }
 
 .save:hover {
+  font-size: 2vw;
   text-shadow: 2px 4px 2px var(--white);
-}
-
-.delete:hover {
-  text-shadow: 2px 4px 2px var(--primary);
 }
 
 .loading{
