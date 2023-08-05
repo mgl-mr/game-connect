@@ -22,7 +22,7 @@ export default {
 
 :root {
   --primary: #B946FF;
-  --accent: #26FF8A;
+  --accent: #2BFF8B;
   --dark: #1C1C1E;
   --white: #FFFFFF;
   --pressStart: 'Press Start 2P', sans-serif;
