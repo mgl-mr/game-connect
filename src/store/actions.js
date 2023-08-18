@@ -95,6 +95,8 @@ export default {
         games: userData.games,
         friendsId: [],
         gamesId,
+        sentFriendRequests: [],
+        receivedFriendRequests: [],
       });
 
       sendEmailVerification(userAuth.user);
