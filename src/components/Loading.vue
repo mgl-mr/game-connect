@@ -29,7 +29,7 @@ export default {
   width: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   overflow: hidden;
-  position: relative;
+  position: absolute;
 }
 
 .fingerprint-spinner .spinner-ring {

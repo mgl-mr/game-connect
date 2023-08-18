@@ -1,9 +1,9 @@
 <template>
-  <div>
-    <div v-show="$store.state.user.suggestions.length === 0 && !loading" class="no-suggestions">
+  <div class="component">
+    <div v-show="$store.state.user.suggestions.length === 0" class="no-suggestions">
       Sem sugestões
     </div>
-    <div v-show="$store.state.user.suggestions.length !== 0 && !loading" class="list-suggestions">
+    <div v-show="$store.state.user.suggestions.length !== 0" class="list-suggestions">
       <div
         v-for="(suggestion) in $store.state.user.suggestions" :key="suggestion.id"
         v-show="suggestion.id !==  $store.state.user.id"
@@ -68,6 +68,10 @@ export default {
 </script>
 
 <style scoped>
+.component {
+  position: relative;
+}
+
 .no-suggestions {
   color: var(--white);
   font-family: var(--pressStart);
