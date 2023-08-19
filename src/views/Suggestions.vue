@@ -30,7 +30,9 @@
           <p v-show="suggestion.id === hover" class="game-name">
             {{ gameName }}
           </p>
-          <button>SOLICITAR AMIZADE</button>
+          <button @click="sendRequest(suggestion.id)">
+            SOLICITAR AMIZADE
+          </button>
         </div>
       </div>
     </div>
@@ -51,6 +53,25 @@ export default {
       hover: '',
       loading: false,
     };
+  },
+
+  methods: {
+    async sendRequest(id) {
+      this.loading = true;
+
+      const user = {
+        id: this.$store.state.user.id,
+        name: this.$store.state.user.name,
+        imageURL: this.$store.state.user.imageURL,
+      };
+
+      await this.$store.dispatch(
+        'sendFriendRequest',
+        [user, id, this.$store.state.user.sentFriendRequests],
+      );
+
+      this.loading = false;
+    },
   },
 
   async beforeMount() {

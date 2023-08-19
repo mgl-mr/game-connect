@@ -25,6 +25,8 @@ import {
   where,
   getDocs,
   deleteDoc,
+  writeBatch,
+  arrayUnion,
 } from 'firebase/firestore';
 
 import {
@@ -208,6 +210,38 @@ export default {
     commit('setUser', {
       imageURL,
     });
+  },
+
+  async sendFriendRequest({ commit }, payload) {
+    const user = payload[0];
+    const id = payload[1];
+    const sentFriendRequests = payload[2];
+
+    try {
+      const batch = writeBatch(database);
+
+      const userRef = doc(database, `gamers/${user.id}`);
+      batch.update(userRef, {
+        sentFriendRequests: arrayUnion(id),
+      });
+
+      const targetUserRef = doc(database, `gamers/${id}`);
+      batch.update(targetUserRef, {
+        receivedFriendRequests: arrayUnion(user),
+      });
+
+      await batch.commit();
+
+      sentFriendRequests.push(id);
+
+      commit('setUser', {
+        sentFriendRequests,
+      });
+
+      return true;
+    } catch (error) {
+      return false;
+    }
   },
 
   fetchFriends({ commit }, friendsId) {
