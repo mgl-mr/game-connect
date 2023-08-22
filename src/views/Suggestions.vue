@@ -26,11 +26,14 @@
             >
           </div>
         </div>
-        <div class="bottom">
+        <div class="buttom">
           <p v-show="suggestion.id === hover" class="game-name">
             {{ gameName }}
           </p>
-          <button @click="sendRequest(suggestion.id)">
+          <button v-if="requested(suggestion.id)" class="requested">
+            SOLICITADO
+          </button>
+          <button v-else @click="sendRequest(suggestion.id)" class="request">
             SOLICITAR AMIZADE
           </button>
         </div>
@@ -71,6 +74,10 @@ export default {
       );
 
       this.loading = false;
+    },
+
+    requested(id) {
+      return this.$store.state.user.sentFriendRequests.includes(id);
     },
   },
 
@@ -181,7 +188,7 @@ export default {
   border-radius: 5px;
 }
 
-.bottom {
+.buttom {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -201,25 +208,37 @@ export default {
   padding: 0;
 }
 
-.bottom button {
+.buttom button {
   width: 90%;
   height: 70%;
   font-family: var(--pressStart);
-  color: var(--primary);
-  background-color: var(--accent);
   border: 2px solid var(--white);
   border-radius: 15px;
 }
 
-.bottom button:hover {
+.request {
+  color: var(--primary);
+  background-color: var(--accent);
+}
+
+.requested {
+  color: var(--white);
+  background-color: var(--dark);
+}
+
+.buttom .request:hover {
   box-shadow: 0 0 3px 1px rgba(255, 255, 255, 0.5);
   transform: scale(1.05);
   cursor: pointer;
   transition: transform 0.2s ease-in-out;
 }
 
-.bottom button:not(:hover) {
+.buttom .request:not(:hover) {
   transform: scale(1);
   transition: transform 0.2s ease-in-out;
+}
+
+.requested:hover {
+  cursor: not-allowed;
 }
 </style>
