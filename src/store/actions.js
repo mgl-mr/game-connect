@@ -27,6 +27,7 @@ import {
   deleteDoc,
   writeBatch,
   arrayUnion,
+  arrayRemove,
 } from 'firebase/firestore';
 
 import {
@@ -236,6 +237,69 @@ export default {
 
       commit('setUser', {
         sentFriendRequests,
+      });
+
+      return true;
+    } catch (error) {
+      return false;
+    }
+  },
+
+  async acceptFriendRequest({ commit }, payload) {
+    const user = payload[0];
+    const requestId = payload[1];
+
+    try {
+      const batch = writeBatch(database);
+
+      const userRef = doc(database, `gamers/${user.id}`);
+      batch.update(userRef, {
+        receivedFriendRequests: user.receivedFriendRequests,
+        friendsId: arrayUnion(requestId),
+      });
+
+      const targetUserRef = doc(database, `gamers/${requestId}`);
+      batch.update(targetUserRef, {
+        sentFriendRequests: arrayRemove(user.id),
+        friendsId: arrayUnion(user.id),
+      });
+
+      await batch.commit();
+
+      const friendsId = user.friendsId.push(requestId);
+
+      commit('setUser', {
+        friendsId,
+        receivedFriendRequests: user.receivedFriendRequests,
+      });
+
+      return true;
+    } catch (error) {
+      return false;
+    }
+  },
+
+  async deleteFriendRequest({ commit }, payload) {
+    const user = payload[0];
+    const requestId = payload[1];
+
+    try {
+      const batch = writeBatch(database);
+
+      const userRef = doc(database, `gamers/${user.id}`);
+      batch.update(userRef, {
+        receivedFriendRequests: user.receivedFriendRequests,
+      });
+
+      const targetUserRef = doc(database, `gamers/${requestId}`);
+      batch.update(targetUserRef, {
+        sentFriendRequests: arrayRemove(user.id),
+      });
+
+      await batch.commit();
+
+      commit('setUser', {
+        receivedFriendRequests: user.receivedFriendRequests,
       });
 
       return true;
