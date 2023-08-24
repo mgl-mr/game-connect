@@ -21,12 +21,32 @@
       <p class="user-name">{{ $store.state.user.name }}</p>
     </div>
 
-    <input
-      type="text"
-      placeholder="Filtre por nome"
-      class="search"
-      v-model="searchTerm"
-    >
+    <div class="search-container">
+      <input
+        type="text"
+        placeholder="Filtre por nome"
+        class="search"
+        v-model="searchTerm"
+      >
+
+      <div class="bell-container">
+        <p>{{ $store.state.user.receivedFriendRequests.length }}</p>
+        <img
+          v-if="$store.state.user.receivedFriendRequests.length === 0"
+          src="@/assets/images/request_bell_of.png"
+          class="bell"
+          alt="sem notificações de pedido de amizade'"
+          @click="openReceivedRequests"
+        >
+        <img
+          v-else
+          src="@/assets/images/request_bell_on.png"
+          class="bell ringing-bell"
+          alt="notificações de pedido de amizade'"
+          @click="openReceivedRequests"
+        >
+      </div>
+    </div>
 
     <div class="friends">
       <p v-if="$store.state.user.friendsId.length === 0" class="friend-message">
@@ -42,9 +62,9 @@
         @click="showPerfil(friend)"
       >
         <img v-if="friend.imageURL !== ''"
-        :src="friend.imageURL"
-        class="friend-image"
-        alt="Imagem de perfil"
+          :src="friend.imageURL"
+          class="friend-image"
+          alt="Imagem de perfil"
         >
         <img v-else
           src="@/assets/images/user-no-image.png"
@@ -60,9 +80,9 @@
         @click="showPerfil(friend)"
       >
         <img v-if="friend.imageURL !== ''"
-        :src="friend.imageURL"
-        class="friend-image"
-        alt="Imagem de perfil"
+          :src="friend.imageURL"
+          class="friend-image"
+          alt="Imagem de perfil"
         >
         <img v-else
           src="@/assets/images/user-no-image.png"
@@ -89,6 +109,9 @@ export default {
   },
 
   methods: {
+    openReceivedRequests() {
+      this.$store.state.showFriendRequestList = true;
+    },
     // eslint-disable-next-line no-unused-vars
     showPerfil(friend) {
       // TODO: ir para página de perfil do usuário
@@ -153,10 +176,18 @@ export default {
   width: calc(85% - 84px);
 }
 
-.search {
-  width: calc(90% - 4px);
+.search-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 90%;
   height: 4vh;
   margin: 10px 0 5px 0;
+}
+
+.search {
+  width: calc(90% - 4px);
+  height: 100%;
   text-align: center;
   background-color: transparent;
   border: 2px solid var(--white);
@@ -178,6 +209,39 @@ export default {
   box-shadow: 0 0 3px 1px var(--white);
   color: var(--white);
   outline: 0
+}
+
+.bell-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 10%;
+  height: 4vh;
+  padding: 0;
+  margin: 0;
+  position: relative;
+}
+
+.bell {
+  height: 100%;
+}
+
+.bell:hover {
+  cursor: pointer;
+}
+
+.ringing-bell {
+  animation: ring 4s .7s ease-in-out infinite;
+}
+
+.bell-container p {
+  color: var(--white);
+  font-family: var(--pressStart);
+  font-size: 8px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 0;
 }
 
 .friends {
@@ -232,5 +296,33 @@ export default {
   box-shadow: 0 0 3px 1px var(--white);
   transform: scale(1.1);
   transition: transform 0.2s ease-in-out;
+}
+
+@keyframes ring {
+  0% { transform: rotate(0); }
+  1% { transform: rotate(30deg); }
+  3% { transform: rotate(-28deg); }
+  5% { transform: rotate(34deg); }
+  7% { transform: rotate(-32deg); }
+  9% { transform: rotate(30deg); }
+  11% { transform: rotate(-28deg); }
+  13% { transform: rotate(26deg); }
+  15% { transform: rotate(-24deg); }
+  17% { transform: rotate(22deg); }
+  19% { transform: rotate(-20deg); }
+  21% { transform: rotate(18deg); }
+  23% { transform: rotate(-16deg); }
+  25% { transform: rotate(14deg); }
+  27% { transform: rotate(-12deg); }
+  29% { transform: rotate(10deg); }
+  31% { transform: rotate(-8deg); }
+  33% { transform: rotate(6deg); }
+  35% { transform: rotate(-4deg); }
+  37% { transform: rotate(2deg); }
+  39% { transform: rotate(-1deg); }
+  41% { transform: rotate(1deg); }
+
+  43% { transform: rotate(0); }
+  100% { transform: rotate(0); }
 }
 </style>

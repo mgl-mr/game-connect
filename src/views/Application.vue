@@ -5,16 +5,18 @@
       <Navbar />
       <router-view class="component" />
     </div>
+    <RequestsReceived v-show="$store.state.showFriendRequestList"/>
   </div>
 </template>
 
 <script>
 import Sidebar from '@/components/Sidebar.vue';
 import Navbar from '@/components/Navbar.vue';
+import RequestsReceived from '@/components/RequestsReceived.vue';
 
 export default {
   name: 'Application',
-  components: { Sidebar, Navbar },
+  components: { Sidebar, Navbar, RequestsReceived },
 
   async mounted() {
     if (this.$store.state.user.friendsId.length !== 0) {
