@@ -363,7 +363,7 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
 .component {
   display: flex;
   align-items: center;
