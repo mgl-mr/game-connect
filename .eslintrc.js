@@ -22,6 +22,7 @@ module.exports = {
     'import/no-extraneous-dependencies': 'off',
     'vue/multi-word-component-names': 'off',
     'consistent-return': 'off',
+    'max-len': 'off',
     'vuejs-accessibility/click-events-have-key-events': 'off',
     'vuejs-accessibility/mouse-events-have-key-events': 'off',
     'vuejs-accessibility/form-control-has-label': 'off',
