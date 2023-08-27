@@ -14,6 +14,7 @@ import ForgotPass from '@/views/ForgotPass.vue';
 import Application from '@/views/Application.vue';
 import MyProfile from '@/views/MyProfile.vue';
 import Suggestions from '@/views/Suggestions.vue';
+import Match from '@/views/Match.vue';
 
 const routes = [
   {
@@ -74,6 +75,11 @@ const routes = [
         path: '/application/suggestions',
         name: 'application-suggestions',
         component: Suggestions,
+      },
+      {
+        path: '/application/match',
+        name: 'application/match',
+        component: Match,
       },
     ],
   },
