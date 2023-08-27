@@ -13,6 +13,7 @@
       :list="$store.state.userSignup.games"
       :pick="pickGame"
       :max=5
+      class="container-gamer-picker"
     />
 
     <div class="div-error">
@@ -187,6 +188,7 @@ export default {
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  margin-bottom: 20px;
 }
 
 .games div {
@@ -204,6 +206,11 @@ export default {
 
 .games img:hover {
   cursor: pointer;
+}
+
+.container-gamer-picker {
+  width: 60%;
+  height: 40vh;
 }
 
 .buttons {

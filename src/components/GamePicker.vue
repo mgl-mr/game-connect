@@ -1,12 +1,12 @@
 <template>
-  <div class="container-games">
+  <div class="container-gamer-picker">
     <p v-show="hover !== ''">{{ hover }}</p>
     <input
       type="text"
       placeholder="Filtre por nome"
       v-model="searchTerm"
     >
-    <ul id="game-list">
+    <ul class="game-list">
       <li v-for="(game, id) in visibleGames" :key="id">
         <img
           :src="game.imageURL"
@@ -18,6 +18,13 @@
           @mouseleave="hover = ''"
         >
       </li>
+      <button
+        v-show="searchTerm === '' && visibleGames.length !== 30"
+        @click="loadMoreItems"
+        class="more"
+      >
+        VER MAIS
+      </button>
     </ul>
   </div>
 </template>
@@ -72,13 +79,6 @@ export default {
       this.visibleGames = this.games.slice(0, end);
     },
 
-    handleScroll() {
-      const element = document.getElementById('game-list');
-      if (element.scrollHeight - element.scrollTop === element.clientHeight) {
-        this.loadMoreItems();
-      }
-    },
-
     isFull() {
       return this.list.length === this.max;
     },
@@ -92,28 +92,22 @@ export default {
     this.games = this.$store.state.games;
     this.loadMoreItems();
   },
-
-  mounted() {
-    const element = document.getElementById('game-list');
-    element.addEventListener('scroll', this.handleScroll);
-  },
 };
 </script>
 
 <style scoped>
-.container-games {
+.container-gamer-picker {
   display: flex;
   flex-direction: column;
   position: relative;
   align-items: center;
   width: 100%;
-  height: 40vh;
   background-color: var(--dark);
   margin: 0;
   border-radius: 20px;
 }
 
-.container-games p {
+.container-gamer-picker p {
   position: absolute;
   width: 100%;
   top: -20px;
@@ -143,7 +137,7 @@ input:focus {
   border: none;
 }
 
-#game-list {
+.game-list {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -156,11 +150,11 @@ input:focus {
   overflow-y: auto;
 }
 
-#game-list::-webkit-scrollbar {
+.game-list::-webkit-scrollbar {
   width: 0px;
 }
 
-#game-list li {
+.game-list li {
   width: 20%;
 }
 
@@ -174,6 +168,20 @@ input:focus {
   cursor: pointer;
 }
 
+.more {
+  width: 100%;
+  border-radius: 15px;
+  margin-bottom: 10px;
+  border: 0;
+  font-family: var(--pressStart);
+  background-color: var(--accent);
+  color: var(--primary);
+  padding: 5px 0;
+}
+
+.more:hover {
+  cursor: pointer;
+}
 .selected {
   filter: grayscale(100%);
 }

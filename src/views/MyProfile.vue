@@ -49,6 +49,7 @@
         :list="user.games"
         :pick="pickGame"
         :max=5
+        class="container-gamer-picker"
       />
     </div>
     <div class="container-right">
@@ -512,6 +513,10 @@ export default {
 
 .games img:hover {
   cursor: pointer;
+}
+
+.container-gamer-picker {
+  height: 40vh;
 }
 
 /*** PASSWORD ***/ /*** BIRTHDATE ***/ /*** PLAYTIME ***/
