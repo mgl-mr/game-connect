@@ -4,15 +4,26 @@
       to="/application/suggestions"
       :class="{
         'auth-link-selected':checkRoute('/application/suggestions'),
-        'auth-link':!checkRoute('/application/suggestions')}"
+        'auth-link':!checkRoute('/application/suggestions')
+      }"
     >
       Sugestões
+    </router-link>
+    <router-link
+      to="/application/match"
+      :class="{
+         'auth-link-selected':checkRoute('/application/match'),
+         'auth-link':!checkRoute('/application/match')
+      }"
+    >
+      Match
     </router-link>
     <router-link
       to="/application/my-profile"
       :class="{
         'auth-link-selected':checkRoute('/application/my-profile'),
-        'auth-link':!checkRoute('/application/my-profile')}"
+        'auth-link':!checkRoute('/application/my-profile')
+      }"
     >
       Meu perfil
     </router-link>
