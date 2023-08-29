@@ -46,6 +46,14 @@ export default {
       type: Number,
       required: true,
     },
+    full: {
+      type: Boolean,
+      required: false,
+    },
+    initialGamesNumber: {
+      type: Number,
+      required: false,
+    },
   },
 
   data() {
@@ -80,7 +88,7 @@ export default {
     },
 
     isFull() {
-      return this.list.length === this.max;
+      return this.list.length === this.max && !this.full;
     },
 
     selected(game) {
@@ -90,6 +98,7 @@ export default {
 
   created() {
     this.games = this.$store.state.games;
+    typeof this.initialGamesNumber === 'number' && (this.itemsPerLoad = this.initialGamesNumber);
     this.loadMoreItems();
   },
 };
