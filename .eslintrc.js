@@ -23,6 +23,8 @@ module.exports = {
     'vue/multi-word-component-names': 'off',
     'consistent-return': 'off',
     'max-len': 'off',
+    'no-unused-expressions': 'off',
+    'vuejs-accessibility/label-has-for': 'off',
     'vuejs-accessibility/click-events-have-key-events': 'off',
     'vuejs-accessibility/mouse-events-have-key-events': 'off',
     'vuejs-accessibility/form-control-has-label': 'off',
