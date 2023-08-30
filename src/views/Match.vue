@@ -3,6 +3,7 @@
     <p class="match-info">
       A funcionalidade de matchmaking tem como objetivo facilitar a descoberta de jogadores que atendam às suas preferências. Uma vez que você tenha especificado o jogo desejado, seu nível no jogo (como classificação, elo ou patente), o tipo de partida que deseja (casual ou competitiva), o sistema se encarregará de identificar jogadores que se alinhem com esses critérios. Assim que uma correspondência for encontrada, o sistema irá estabelecer automaticamente uma chamada de voz entre os dois jogadores, permitindo que possam se conectar e interagir.
     </p>
+
     <div class="container-match-form">
       <GamePicker
         :list="game"
@@ -12,9 +13,11 @@
         :initialGamesNumber=40
         class="container-gamer-picker"
       />
+
       <div class="match-form">
         <div class="chosen-game">
-          <p>Jogo escolhido</p>
+          <p>Jogo selecionado</p>
+
           <div>
               <div v-if="game.length === 0" class="no-game"></div>
               <img
@@ -24,13 +27,19 @@
                class="game-image"
               >
               <p v-if="game.length !== 0">{{ game[0].name }}</p>
-              <p v-else>Nenhum jogo escolhido</p>
+              <p v-else>Nenhum jogo selecionado</p>
           </div>
+
         </div>
+
         <div class="level-container">
           <p>Qual level está procurando?</p>
-          <select name="level" class="level">
-            <option value="any">Qualquer</option>
+          <select
+            v-model="level"
+            name="level"
+            class="level"
+          >
+            <option value="any" selected>Qualquer</option>
             <option value="bronze">Bronze</option>
             <option value="silver">Prata</option>
             <option value="gold">Ouro</option>
@@ -38,24 +47,66 @@
             <option value="diamond">Diamante</option>
           </select>
         </div>
+
         <div class="type">
           <p>Deseja alguém para jogar:</p>
           <div>
             <div>
-              <input type="radio" id="casual" name="playstyle" value="casual">
+              <input
+                v-model="type"
+                type="radio"
+                id="casual"
+                name="playstyle"
+                value="casual"
+              >
               <label for="casual">Casualmente</label>
             </div>
+
             <div>
-              <input type="radio" id="competitive" name="playstyle" value="competitive">
+              <input
+                v-model="type"
+                type="radio"
+                id="competitive"
+                name="playstyle"
+                value="competitive"
+              >
               <label for="competitive">Competitivamente</label>
             </div>
+
             <div>
-              <input type="radio" id="any" name="playstyle" value="any">
+              <input
+                v-model="type"
+                type="radio"
+                id="any"
+                name="playstyle"
+                value="any"
+              >
               <label for="any">Qualquer</label>
             </div>
           </div>
         </div>
-        <button class="start">INICIAR MATCH</button>
+
+        <div class="div-error">
+          <p
+            class="auth-error"
+            :class="{
+              'error':error,
+              'input-error':msgError
+            }"
+          >
+            {{ msg }}
+          </p>
+        </div>
+
+        <div class="button-create">
+          <button
+            type="button"
+            class="create"
+            @click="createMatch"
+          >
+            MATCH
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -71,12 +122,48 @@ export default {
   data() {
     return {
       game: [],
+      level: 'any',
+      type: null,
+      msg: '',
+      msgError: false,
+      error: false,
+      loading: true,
     };
   },
 
   methods: {
     pickGame(game) {
       this.game = [game];
+    },
+
+    createMatch() {
+      if (this.game.length === 0) {
+        this.informError('Selecione um jogo!');
+        return;
+      }
+
+      if (this.type === null) {
+        this.informError('Selecione o modo!');
+        return;
+      }
+
+      const match = {
+        gameId: this.game[0].id,
+        level: this.level,
+        type: this.type,
+      };
+
+      this.loading = true;
+      console.log(match);
+    },
+
+    informError(message) {
+      this.msg = message;
+      this.error = true;
+      this.msgError = true;
+      setTimeout(() => {
+        this.msgError = false;
+      }, 500);
     },
   },
 };
@@ -131,12 +218,11 @@ export default {
   height: 100%;
 }
 
-.match-form > div {
+.chosen-game {
   width: 100%;
   background-color: var(--dark);
   border-radius: 15px;
 }
-
 .chosen-game  p {
   width: calc(100% - 12vh - 30px);
   font-family: var(--pressStart);
@@ -161,6 +247,12 @@ export default {
 
 .no-game {
   background-color: var(--white);
+}
+
+.level-container {
+  width: 100%;
+  background-color: var(--dark);
+  border-radius: 15px;
 }
 
 .level-container > p {
@@ -194,6 +286,12 @@ export default {
   color: var(--white);
 }
 
+.type {
+  width: 100%;
+  background-color: var(--dark);
+  border-radius: 15px;
+}
+
 .type > p {
   width: calc(100% - 30px);
   font-family: var(--pressStart);
@@ -220,20 +318,71 @@ export default {
   cursor: pointer;
 }
 
-.start {
-  width: 100%;
-  background-color: var(--accent);
-  color: var(--primary);
-  font-family: var(--pressStart);
-  padding: 10px 0;
-  border: none;
-  border-radius: 10px;
-  transition: transform 0.2s ease-in-out;
+.button-create {
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% - 1vh);
+  background: transparent;
+  border-radius: 15px;
+  margin-bottom: 1vh;
+  height: 7vh;
+  border: 0.5vh solid var(--accent);
 }
 
-.start:hover {
-  cursor: pointer;
-  transform: scale(1.05);
+.button-create:hover {
   box-shadow: 0 0 3px 1px rgba(255, 255, 255, 0.5);
+}
+
+.create {
+  position: absolute;
+  border: 0;
+  border-radius: 10px;
+  font-family: var(--pressStart);
+  transition: font-size 0.2s ease-in-out;
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
+  background-color: var(--accent);
+  color: var(--primary);
+  font-size: 1.8vw;
+}
+
+.create:hover {
+  cursor: pointer;
+  font-size: 2vw;
+  text-shadow: 2px 4px 2px var(--white);
+}
+
+.div-error {
+  height: 4vh;
+  margin: 0;
+  text-align: center;
+}
+
+.auth-error {
+  display: none;
+  margin: 0;
+  font-size: 1.5vw;
+  color: var(--white);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.error {
+  display: block;
+}
+
+.input-error {
+  color: var(--accent);
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  50% { transform: translateX(10px); }
+  75% { transform: translateX(-10px); }
+  100% { transform: translateX(0); }
 }
 </style>
