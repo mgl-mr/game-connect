@@ -109,15 +109,17 @@
         </div>
       </div>
     </div>
+    <MatchLoading :cancel="cancel" v-show="loading"/>
   </div>
 </template>
 
 <script>
 import GamePicker from '@/components/GamePicker.vue';
+import MatchLoading from '@/components/MatchLoading.vue';
 
 export default {
   name: 'Match',
-  components: { GamePicker },
+  components: { GamePicker, MatchLoading },
 
   data() {
     return {
@@ -127,7 +129,7 @@ export default {
       msg: '',
       msgError: false,
       error: false,
-      loading: true,
+      loading: false,
     };
   },
 
@@ -157,6 +159,10 @@ export default {
       console.log(match);
     },
 
+    cancel() {
+      this.loading = false;
+    },
+
     informError(message) {
       this.msg = message;
       this.error = true;
@@ -175,6 +181,7 @@ export default {
   align-items: center;
   justify-content: space-around;
   flex-direction: column;
+  position: relative;
 }
 
 .match-info {
