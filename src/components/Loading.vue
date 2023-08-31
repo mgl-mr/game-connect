@@ -1,5 +1,5 @@
 <template>
-  <div class="fingerprint-spinner">
+  <div class="fingerprint-spinner" :class="{'background':background}">
     <div class="spinner-ring"></div>
     <div class="spinner-ring"></div>
     <div class="spinner-ring"></div>
@@ -15,6 +15,14 @@
 <script>
 export default {
   name: 'Loading',
+
+  props: {
+    background: {
+      type: Boolean,
+      required: false,
+    },
+  },
+
 };
 </script>
 
@@ -30,6 +38,10 @@ export default {
   background-color: rgba(0, 0, 0, 0.5);
   overflow: hidden;
   position: absolute;
+}
+
+.background {
+  background-color: transparent;
 }
 
 .fingerprint-spinner .spinner-ring {
