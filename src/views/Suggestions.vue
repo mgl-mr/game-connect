@@ -8,7 +8,14 @@
         v-for="(suggestion) in $store.state.user.suggestions" :key="suggestion.id"
         v-show="suggestion.id !==  $store.state.user.id"
         class="suggestions"
+        @mouseover="cardHover = suggestion.id"
+        @mouseleave="cardHover= ''"
       >
+        <div class="status-container">
+          <p v-show="suggestion.id === cardHover">{{ suggestion.status }}</p>
+          <div v-if="suggestion.status === 'online'" class="online"></div>
+          <div v-else class="offline"></div>
+        </div>
         <img :src="suggestion.imageURL" :alt="suggestion.name">
         <p class="suggestion-name">{{ suggestion.name }}</p>
         <p class="suggestion-bio">{{ suggestion.bio }}</p>
@@ -21,13 +28,13 @@
             <img
               :src="game.imageURL"
               :alt="game.name"
-              @mouseover="gameName = game.name, hover = suggestion.id"
+              @mouseover="gameName = game.name, gameHover = suggestion.id"
               @mouseleave="gameName = ''"
             >
           </div>
         </div>
         <div class="buttom">
-          <p v-show="suggestion.id === hover" class="game-name">
+          <p v-show="suggestion.id === gameHover" class="game-name">
             {{ gameName }}
           </p>
           <button v-if="requested(suggestion.id)" class="requested">
@@ -53,7 +60,8 @@ export default {
   data() {
     return {
       gameName: '',
-      hover: '',
+      gameHover: '',
+      cardHover: '',
       loading: false,
     };
   },
@@ -131,6 +139,7 @@ export default {
   color: var(--white);
   background-color: var(--dark);
   border: 2px solid var(--accent);
+  position: relative;
 }
 
 .suggestions:hover {
@@ -141,6 +150,38 @@ export default {
 .suggestions:not(:hover) {
   transform: scale(1);
   transition: transform 0.2s ease-in-out;
+}
+
+.status-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+}
+
+.status-container p {
+  font-family: var(--pressStart);
+  font-size: 10px;
+  margin: 0;
+}
+
+.status-container div {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid var(--white);
+  margin-left: 3px;
+}
+
+.online {
+  background-color: var(--accent);
+  box-shadow: 0 0 3px 1px var(--accent);
+}
+
+.offline {
+  background-color: var(--dark);
 }
 
 .suggestions > img {

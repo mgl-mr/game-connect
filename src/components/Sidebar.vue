@@ -60,6 +60,8 @@
         v-for="(friend, id) in $store.state.user.friends" :key="id"
         class="friend"
         @click="showPerfil(friend)"
+        @mouseover="hover = friend.id"
+        @mouseleave="hover = ''"
       >
         <img v-if="friend.imageURL !== ''"
           :src="friend.imageURL"
@@ -72,12 +74,19 @@
           alt="Imagem de perfil"
         >
         <p class="friend-name">{{ friend.name }}</p>
+        <div class="status-container">
+          <p v-show="friend.id === hover">{{ friend.status }}</p>
+          <div v-if="friend.status === 'online'" class="online"></div>
+          <div v-else class="offline"></div>
+        </div>
       </div>
       <div
         v-else
         v-for="(friend, index) in $store.state.user.friends" :key="index"
         class="friend"
         @click="showPerfil(friend)"
+        @mouseover="hover = friend.id"
+        @mouseleave="hover = ''"
       >
         <img v-if="friend.imageURL !== ''"
           :src="friend.imageURL"
@@ -90,6 +99,11 @@
           alt="Imagem de perfil"
         >
         <p class="friend-name">{{ friend.name }}</p>
+        <div class="status-container">
+          <p v-show="friend.id === hover">{{ friend.status }}</p>
+          <div v-if="friend.status === 'online'" class="online"></div>
+          <div v-else class="offline"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -105,6 +119,7 @@ export default {
       friends: false,
       filteredFriends: false,
       searchTerm: '',
+      hover: '',
     };
   },
 
@@ -271,6 +286,7 @@ export default {
   padding-bottom: 5px;
   padding-left: 5px;
   border-bottom: 2px solid var(--white);
+  position: relative;
 }
 
 .friend-image{
@@ -296,6 +312,39 @@ export default {
   box-shadow: 0 0 3px 1px var(--white);
   transform: scale(1.1);
   transition: transform 0.2s ease-in-out;
+}
+
+.status-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+}
+
+.status-container p {
+  font-family: var(--pressStart);
+  font-size: 10px;
+  color: var(--white);
+  margin: 0;
+}
+
+.status-container div {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid var(--white);
+  margin-left: 3px;
+}
+
+.online {
+  background-color: var(--accent);
+  box-shadow: 0 0 3px 1px var(--accent);
+}
+
+.offline {
+  background-color: var(--dark);
 }
 
 @keyframes ring {
