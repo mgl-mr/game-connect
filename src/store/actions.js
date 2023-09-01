@@ -48,6 +48,11 @@ export default {
 
       if (credentials.user.emailVerified) {
         const userRef = doc(database, `gamers/${credentials.user.uid}`);
+
+        await updateDoc(userRef, {
+          status: 'online',
+        });
+
         const userDoc = await getDoc(userRef);
         if (userDoc.exists()) {
           const user = userDoc.data();
@@ -96,6 +101,7 @@ export default {
         end: userData.end,
         imageURL: downloadURL,
         games: userData.games,
+        status: 'offline',
         friendsId: [],
         gamesId,
         sentFriendRequests: [],
@@ -323,6 +329,7 @@ export default {
           end: document.data().end,
           imageURL: document.data().imageURL,
           games: document.data().games,
+          status: document.data().status,
         });
       });
       commit('setUser', {
@@ -344,6 +351,7 @@ export default {
         start: document.data().start,
         end: document.data().end,
         imageURL: document.data().imageURL,
+        status: document.data().status,
       }));
 
       commit('setUser', {
