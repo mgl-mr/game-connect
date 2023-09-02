@@ -141,6 +141,17 @@
           DELETAR
         </button>
       </div>
+
+      <div class="button-delete">
+        <div class="button-loading" :class="{'loading':leaving}"></div>
+        <button
+          type="button"
+          class="delete"
+          @click="logout"
+        >
+          SAIR
+        </button>
+      </div>
     </div>
     <ConfirmationModal
       v-show="showModal"
@@ -164,6 +175,7 @@ export default {
       user: null,
       saving: false,
       deleting: false,
+      leaving: false,
       msg: '',
       msgError: false,
       error: false,
@@ -270,6 +282,21 @@ export default {
         this.$router.push('/authentication/sign-in');
       } else {
         this.informError('Erro ao deletar conta.');
+      }
+    },
+
+    async logout() {
+      this.leaving = true;
+      const logout = await this.$store.dispatch(
+        'logout',
+        this.user.id,
+      );
+      this.leaving = false;
+
+      if (logout) {
+        this.$router.push('/authentication/sign-in');
+      } else {
+        this.informError('Erro ao sair.');
       }
     },
 

@@ -1,6 +1,10 @@
 export default {
   setUser(state, user) {
-    state.user = { ...state.user, ...user };
+    if (user) {
+      state.user = { ...state.user, ...user };
+    } else {
+      state.user = {};
+    }
   },
 
   setUserSignup(state, user) {
@@ -9,6 +13,10 @@ export default {
 
   setGames(state, games) {
     state.games = games;
+  },
+
+  setListeners(state, listeners) {
+    state.listeners = listeners;
   },
 
   setListener(state, listener) {

@@ -71,6 +71,28 @@ export default {
     }
   },
 
+  async logout({ commit, state }, id) {
+    try {
+      const userRef = doc(database, `gamers/${id}`);
+      await updateDoc(userRef, {
+        status: 'offline',
+      });
+
+      await auth.signOut();
+
+      state.listeners.forEach((listener) => {
+        listener();
+      });
+
+      commit('setListeners', []);
+      commit('setUser', null);
+
+      return true;
+    } catch (error) {
+      return false;
+    }
+  },
+
   async signUp({ commit }, userData) {
     try {
       let downloadURL = '';
