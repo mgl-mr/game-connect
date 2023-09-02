@@ -18,10 +18,8 @@ export default {
   name: 'Application',
   components: { Sidebar, Navbar, RequestsReceived },
 
-  async mounted() {
-    if (this.$store.state.user.friendsId.length !== 0) {
-      await this.$store.dispatch('fetchFriends', this.$store.state.user.friendsId);
-    }
+  mounted() {
+    this.$store.dispatch('fetchListeners', this.$store.state.user.id);
   },
 };
 </script>

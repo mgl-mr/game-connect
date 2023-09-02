@@ -314,26 +314,67 @@ export default {
     }
   },
 
-  fetchFriends({ commit }, friendsId) {
-    const friendsRef = collection(database, 'gamers');
-    const friendsQuery = query(friendsRef, where('__name__', 'in', friendsId));
-    onSnapshot(friendsQuery, (querySnapshot) => {
-      const friends = [];
-      querySnapshot.forEach((document) => {
-        friends.push({
-          id: document.id,
-          name: document.data().name,
-          bio: document.data().bio,
-          birthdate: document.data().birthdate,
-          start: document.data().start,
-          end: document.data().end,
-          imageURL: document.data().imageURL,
-          games: document.data().games,
-          status: document.data().status,
-        });
-      });
+  fetchListeners({ commit, state }, id) {
+    const unsub = onSnapshot(doc(database, 'gamers', id), (userSnapshot) => {
+      commit('setListener', unsub);
+
+      const { friendsId } = userSnapshot.data();
+      const { sentFriendRequests } = userSnapshot.data();
+      const { receivedFriendRequests } = userSnapshot.data();
+
       commit('setUser', {
-        friends,
+        friendsId,
+        sentFriendRequests,
+        receivedFriendRequests,
+      });
+
+      const friendListeners = {};
+      const { friends } = state.user;
+
+      friendsId.forEach((friendId) => {
+        if (!(friendId in friendListeners)) {
+          const unsubscribe = onSnapshot(doc(database, 'gamers', friendId), (friendSnapshot) => {
+            commit('setListener', unsubscribe);
+
+            if (!friendSnapshot.exists) {
+              const userRef = doc(database, `gamers/${id}`);
+
+              updateDoc(userRef, {
+                friendsId: arrayRemove(friendId),
+              });
+
+              if (friendListeners[friendId]) {
+                friendListeners[friendId]();
+                delete friendListeners[friendId];
+              } else unsubscribe();
+            } else {
+              const friendData = {
+                id: friendSnapshot.id,
+                name: friendSnapshot.data().name,
+                bio: friendSnapshot.data().bio,
+                birthdate: friendSnapshot.data().birthdate,
+                start: friendSnapshot.data().start,
+                end: friendSnapshot.data().end,
+                imageURL: friendSnapshot.data().imageURL,
+                games: friendSnapshot.data().games,
+                status: friendSnapshot.data().status,
+              };
+
+              const existingFriendIndex = friends.findIndex((friend) => friend.id === friendSnapshot.id);
+              if (existingFriendIndex !== -1) {
+                friends[existingFriendIndex] = friendData;
+              } else {
+                friends.push(friendData);
+              }
+
+              commit('setUser', {
+                friends,
+              });
+            }
+          });
+
+          friendListeners[friendId] = unsubscribe;
+        }
       });
     });
   },
