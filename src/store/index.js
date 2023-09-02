@@ -22,6 +22,7 @@ export default createStore({
       urlImage: '',
       games: [],
     },
+    listeners: [],
     showFriendRequestList: false,
   },
   getters,
