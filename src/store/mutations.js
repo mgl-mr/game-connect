@@ -10,4 +10,8 @@ export default {
   setGames(state, games) {
     state.games = games;
   },
+
+  setListener(state, listener) {
+    state.listeners.push(listener);
+  },
 };
