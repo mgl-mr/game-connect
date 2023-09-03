@@ -10,4 +10,8 @@ export default {
   setGames(state, games) {
     state.games = games;
   },
+
+  setMatch(state, match) {
+    state.match = match;
+  },
 };

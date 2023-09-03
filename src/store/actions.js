@@ -354,6 +354,66 @@ export default {
     }
   },
 
+  async createMatch({ commit }, match) {
+    try {
+      const matchRef = doc(database, `matches/${match.gamerId}`);
+      await setDoc(matchRef, match);
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+
+    const matchQuery = query(collection(database, 'matches'), where('gameId', '==', match.gameId), where('__name__', '!=', match.gamerId));
+    const unsubscribe = onSnapshot(matchQuery, (querySnapshot) => {
+      querySnapshot.forEach((document) => {
+        let find = true;
+
+        if (!match.anyAge || !document.data().anyAge) {
+          if (!match.anyAge) {
+            if (document.data().age < match.minAge || document.data().age > match.maxAge) {
+              find = false;
+            }
+          }
+          if (!document.data().anyAge) {
+            if (match.age < document.data().minAge || match.age > document.data().maxAge) {
+              find = false;
+            }
+          }
+        }
+
+        if (match.wantedLevel !== document.data().wantedLevel) {
+          if (match.wantedLevel !== 'any' || document.data().wantedLevel !== 'any') {
+            find = false;
+          } else if (match.wantedLevel === 'any') {
+            if (match.myLevel !== document.data().wantedLevel) {
+              find = false;
+            }
+          } else if (document.data().myLevel !== match.wantedLevel) {
+            find = false;
+          }
+        }
+
+        if (match.type !== document.data().type) {
+          if (match.type !== 'any' || document.data().type !== 'any') {
+            find = false;
+          }
+        }
+
+        console.log(find);
+        if (find) {
+          // TODO: excluir matches. fazer ligação
+        }
+      });
+    });
+
+    commit('setMatch', {
+      inMatch: true,
+      unsubscribe,
+    });
+
+    return true;
+  },
+
   async fetchGames({ commit }) {
     try {
       const gamesRef = collection(database, 'games');
