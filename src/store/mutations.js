@@ -15,11 +15,7 @@ export default {
     state.games = games;
   },
 
-  setListeners(state, listeners) {
-    state.listeners = listeners;
-  },
-
-  setListener(state, listener) {
-    state.listeners.push(listener);
+  setMatch(state, match) {
+    state.match = match;
   },
 };

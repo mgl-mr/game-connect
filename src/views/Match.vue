@@ -1,41 +1,92 @@
 <template>
   <div class="component">
-    <p class="match-info">
-      A funcionalidade de matchmaking tem como objetivo facilitar a descoberta de jogadores que atendam às suas preferências. Uma vez que você tenha especificado o jogo desejado, seu nível no jogo (como classificação, elo ou patente), o tipo de partida que deseja (casual ou competitiva), o sistema se encarregará de identificar jogadores que se alinhem com esses critérios. Assim que uma correspondência for encontrada, o sistema irá estabelecer automaticamente uma chamada de voz entre os dois jogadores, permitindo que possam se conectar e interagir.
+    <p v-show="showInfo" class="match-info">
+      A funcionalidade de matchmaking tem como objetivo facilitar a descoberta de jogadores que atendam às suas preferências. Uma vez que você tenha especificado o jogo desejado, seu nível no jogo (como classificação, elo ou patente), o tipo de partida que deseja (casual ou competitiva) e a idade, o sistema se encarregará de identificar jogadores que se alinhem com esses critérios. Assim que uma correspondência for encontrada, o sistema irá estabelecer automaticamente uma chamada de voz entre os dois jogadores, permitindo que possam se conectar e interagir.
     </p>
 
     <div class="container-match-form">
-      <GamePicker
-        :list="game"
-        :pick="pickGame"
-        :max=1
-        :full=true
-        :initialGamesNumber=40
-        class="container-gamer-picker"
-      />
-
-      <div class="match-form">
+      <div class="pick-game">
         <div class="chosen-game">
           <p>Jogo selecionado</p>
 
           <div>
-              <div v-if="game.length === 0" class="no-game"></div>
-              <img
+            <div v-if="game.length === 0" class="no-game"></div>
+            <img
               v-else
-                :src="game[0].imageURL"
-                :alt="game[0].name"
-               class="game-image"
-              >
-              <p v-if="game.length !== 0">{{ game[0].name }}</p>
-              <p v-else>Nenhum jogo selecionado</p>
+              :src="game[0].imageURL"
+              :alt="game[0].name"
+              class="game-image"
+            >
+            <p v-if="game.length !== 0">{{ game[0].name }}</p>
+            <p v-else>Nenhum jogo selecionado</p>
           </div>
+        </div>
+        <GamePicker
+          :list="game"
+          :pick="pickGame"
+          :max=1
+          :full=true
+          :initialGamesNumber=40
+          class="container-gamer-picker"
+        />
+      </div>
 
+      <div class="match-form">
+        <div class="age-container">
+          <p>Deseja encontrar alguém com qual idade?</p>
+          <div>
+            <div>
+              <label for="min">De</label>
+              <input
+                placeholder="0"
+                type="number"
+                id="min"
+                class="age"
+                :class="{'read-only': anyAge}"
+                v-model="minAge"
+                :readonly="anyAge"
+              >
+              <label for="max">A</label>
+              <input
+                placeholder="99"
+                type="number"
+                id="max"
+                class="age"
+                :class="{'read-only': anyAge}"
+                v-model="maxAge"
+                :readonly="anyAge"
+              >
+            </div>
+            <div>
+              <input
+                type="checkbox"
+                id="any-age"
+                v-model="anyAge"
+              >
+              <label for="any-age">Qualquer</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="level-container">
+          <p>Qual seu level?</p>
+          <select
+            v-model="myLevel"
+            name="level"
+            class="level"
+          >
+            <option value="bronze" selected>Bronze</option>
+            <option value="silver">Prata</option>
+            <option value="gold">Ouro</option>
+            <option value="platinum">Platina</option>
+            <option value="diamond">Diamante</option>
+          </select>
         </div>
 
         <div class="level-container">
           <p>Qual level está procurando?</p>
           <select
-            v-model="level"
+            v-model="wantedLevel"
             name="level"
             class="level"
           >
@@ -106,10 +157,17 @@
           >
             MATCH
           </button>
+          <p
+            class="show-info"
+            @mouseover="showInfo = true"
+            @mouseleave="showInfo = false"
+          >
+            ?
+          </p>
         </div>
       </div>
     </div>
-    <MatchLoading :cancel="cancel" v-show="loading"/>
+    <MatchLoading :cancel="cancel" v-show="$store.state.match.inMatch"/>
   </div>
 </template>
 
@@ -124,12 +182,16 @@ export default {
   data() {
     return {
       game: [],
-      level: 'any',
+      myLevel: 'bronze',
+      wantedLevel: 'any',
       type: null,
+      minAge: '',
+      maxAge: '',
+      anyAge: false,
       msg: '',
       msgError: false,
       error: false,
-      loading: false,
+      showInfo: false,
     };
   },
 
@@ -138,10 +200,22 @@ export default {
       this.game = [game];
     },
 
-    createMatch() {
+    async createMatch() {
       if (this.game.length === 0) {
         this.informError('Selecione um jogo!');
         return;
+      }
+
+      if (this.anyAge === false) {
+        if (this.minAge === '' && this.maxAge === '') {
+          this.informError('Selecione a idade que deseja!');
+          return;
+        }
+
+        if (this.minAge > this.maxAge) {
+          this.informError('A primeira idade deve ser menor!');
+          return;
+        }
       }
 
       if (this.type === null) {
@@ -150,17 +224,36 @@ export default {
       }
 
       const match = {
+        gamerId: this.$store.state.user.id,
         gameId: this.game[0].id,
-        level: this.level,
+        myLevel: this.myLevel,
+        wantedLevel: this.wantedLevel,
         type: this.type,
+        anyAge: this.anyAge,
+        minAge: this.minAge,
+        maxAge: this.maxAge,
       };
 
-      this.loading = true;
-      console.log(match);
+      const birthdate = new Date(this.$store.state.user.birthdate);
+      const age = Math.floor((new Date() - birthdate) / (365.25 * 24 * 60 * 60 * 1000));
+
+      match.age = age;
+
+      this.$store.state.match.inMatch = true;
+      const result = await this.$store.dispatch('createMatch', match);
+
+      if (!result) {
+        this.$store.state.match.inMatch = true;
+        this.informError('Erro ao criar Match!');
+      }
     },
 
-    cancel() {
-      this.loading = false;
+    async cancel() {
+      const response = await this.$store.dispatch('deleteMatch');
+
+      if (response) {
+        this.informError('Match Cancelada!');
+      }
     },
 
     informError(message) {
@@ -185,19 +278,20 @@ export default {
 }
 
 .match-info {
-  width: calc(90% - 20px);
+  width: calc(45% - 20px);
   height: auto;
-  max-height: 15vh;
   margin: 10px 0;
   padding: 10px;
   border-radius: 15px;
-  background-color: var(--dark);
+  background-color: var(--white);
   font-size: 10px;
   font-family: var(--pressStart);
-  color: var(--white);
+  color: var(--dark);
   line-height: 1.2;
   text-align: justify;
-  overflow: auto;
+  position: absolute;
+  right: 5%;
+  bottom: 11vh;
 }
 
 .match-info::-webkit-scrollbar {
@@ -209,19 +303,14 @@ export default {
   align-items: center;
   justify-content: space-between;
   width: 90%;
+  height: 80vh;
 }
 
-.container-gamer-picker {
-  width: 45%;
-  height: 60vh;
-}
-
-.match-form {
+.pick-game {
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: space-between;
-  width: 50%;
+  width: 45%;
   height: 100%;
 }
 
@@ -247,13 +336,75 @@ export default {
 
 .no-game,
 .game-image {
-  width: 12vh;
-  height: 12vh;
+  width: 80px;
+  height: 80px;
   border-radius: 15px;
 }
 
 .no-game {
   background-color: var(--white);
+}
+
+.container-gamer-picker {
+  width: 100%;
+  height: calc(100% - 170px);
+}
+
+.match-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 50%;
+  height: 100%;
+}
+
+.age-container {
+  width: 100%;
+  background-color: var(--dark);
+  border-radius: 15px;
+}
+
+.age-container > p {
+  width: calc(100% - 30px);
+  font-family: var(--pressStart);
+  font-size: 12px;
+  color: var(--white);
+  margin: 15px;
+}
+
+.age-container > div {
+  display: flex;
+  align-items: center;
+  width: calc(100% - 30px);
+  margin: 15px;
+}
+
+.age-container label {
+  font-family: var(--pressStart);
+  font-size: 12px;
+  color: var(--white);
+}
+
+.age-container .age {
+  width: 90px;
+  background-color: var(--primary);
+  color: var(--white);
+  font-family: var(--pressStart);
+  text-align: center;
+  margin-left: 5px;
+  margin-right: 15px;
+  border: none;
+  border-radius: 5px;
+}
+
+.age-container .age::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.read-only {
+  filter: grayscale(100%);
+  pointer-events: none;
 }
 
 .level-container {
@@ -337,6 +488,22 @@ export default {
   margin-bottom: 1vh;
   height: 7vh;
   border: 0.5vh solid var(--accent);
+}
+
+.show-info {
+  position:absolute;
+  right: 10px;
+  font-family: var(--pressStart);
+  color: var(--white);
+  font-size: 1.8vw;
+  border-radius: 50%;
+  margin: 0;
+  transition: transform 0.2s ease-in-out;
+}
+
+.show-info:hover {
+  cursor: help;
+  transform: scale(1.1);
 }
 
 .button-create:hover {
