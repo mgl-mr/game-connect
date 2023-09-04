@@ -248,8 +248,12 @@ export default {
       }
     },
 
-    cancel() {
-      this.loading = false;
+    async cancel() {
+      const response = await this.$store.dispatch('deleteMatch');
+
+      if (response) {
+        this.informError('Match Cancelada!');
+      }
     },
 
     informError(message) {

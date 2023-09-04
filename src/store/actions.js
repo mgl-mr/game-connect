@@ -414,6 +414,22 @@ export default {
     return true;
   },
 
+  async deleteMatch({ commit, state }) {
+    try {
+      await deleteDoc(doc(database, 'matches', state.user.id));
+
+      const { match } = state;
+      match.unsubscribe && match.unsubscribe();
+      match.unsubscribe = null;
+      match.inMatch = false;
+
+      commit('setMatch', match);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  },
+
   async fetchGames({ commit }) {
     try {
       const gamesRef = collection(database, 'games');
