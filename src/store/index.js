@@ -28,6 +28,9 @@ export default createStore({
       unsubscribe: null,
     },
     showFriendRequestList: false,
+    voIP: {
+      inVoIP: false,
+    },
   },
   getters,
   mutations,
