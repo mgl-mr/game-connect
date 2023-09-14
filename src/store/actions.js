@@ -453,7 +453,7 @@ export default {
         }
 
         if (match.wantedLevel !== document.data().wantedLevel) {
-          if (match.wantedLevel !== 'any' || document.data().wantedLevel !== 'any') {
+          if (match.wantedLevel !== 'any' && document.data().wantedLevel !== 'any') {
             find = false;
           } else if (match.wantedLevel === 'any') {
             if (match.myLevel !== document.data().wantedLevel) {
