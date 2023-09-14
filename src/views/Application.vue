@@ -6,6 +6,7 @@
       <router-view class="component" />
     </div>
     <RequestsReceived v-show="$store.state.showFriendRequestList"/>
+    <VoIP v-show="$store.state.voIP.inVoIP" />
   </div>
 </template>
 
@@ -13,10 +14,16 @@
 import Sidebar from '@/components/Sidebar.vue';
 import Navbar from '@/components/Navbar.vue';
 import RequestsReceived from '@/components/RequestsReceived.vue';
+import VoIP from '@/components/VoIP.vue';
 
 export default {
   name: 'Application',
-  components: { Sidebar, Navbar, RequestsReceived },
+  components: {
+    Sidebar,
+    Navbar,
+    RequestsReceived,
+    VoIP,
+  },
 
   mounted() {
     this.$store.dispatch('fetchListeners', this.$store.state.user.id);
@@ -30,6 +37,7 @@ export default {
   justify-content: center;
   align-items: center;
   background: linear-gradient(180deg, var(--dark), var(--primary));
+  position: relative;
 }
 
 .application {
