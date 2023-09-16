@@ -33,6 +33,12 @@ export default createStore({
       loading: false,
       matchedUser: {},
     },
+    optionsMenu: {
+      x: 0,
+      y: 0,
+      show: false,
+      user: {},
+    },
   },
   getters,
   mutations,
