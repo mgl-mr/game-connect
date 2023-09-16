@@ -425,7 +425,7 @@ export default {
     }
   },
 
-  async createMatch({ commit }, match) {
+  async createMatch({ commit, dispatch, state }, match) {
     try {
       const matchRef = doc(database, `matches/${match.gamerId}`);
       await setDoc(matchRef, match);
@@ -470,9 +470,20 @@ export default {
           }
         }
 
-        console.log(find);
         if (find) {
-          // TODO: excluir matches. fazer ligação
+          const m = state.match;
+          m.unsubscribe && m.unsubscribe();
+          m.unsubscribe = null;
+
+          dispatch('deleteMatch');
+
+          const matchedUser = {
+            id: document.id,
+            name: document.data().gamerName,
+            imageURL: document.data().gamerImageURL,
+          };
+
+          dispatch('createVoIPMath', matchedUser);
         }
       });
     });
@@ -499,6 +510,14 @@ export default {
     } catch (error) {
       return false;
     }
+  },
+
+  async createVoIPMath({ commit, state }, matchedUser) {
+    commit('setVoIP', {
+      matchedUser,
+      inVoIP: true,
+      loading: true,
+    });
   },
 
   async fetchGames({ commit }) {
