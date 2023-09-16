@@ -26,4 +26,8 @@ export default {
   setMatch(state, match) {
     state.match = match;
   },
+
+  setVoIP(state, voIP) {
+    state.voIP = { ...state.voIP, ...voIP };
+  },
 };
