@@ -225,6 +225,8 @@ export default {
 
       const match = {
         gamerId: this.$store.state.user.id,
+        gamerName: this.$store.state.user.name,
+        gamerImageURL: this.$store.state.user.imageURL,
         gameId: this.game[0].id,
         myLevel: this.myLevel,
         wantedLevel: this.wantedLevel,
