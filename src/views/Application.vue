@@ -7,6 +7,7 @@
     </div>
     <RequestsReceived v-show="$store.state.showFriendRequestList"/>
     <VoIP v-show="$store.state.voIP.inVoIP" />
+    <Options v-show="$store.state.optionsMenu.show" />
   </div>
 </template>
 
@@ -15,6 +16,7 @@ import Sidebar from '@/components/Sidebar.vue';
 import Navbar from '@/components/Navbar.vue';
 import RequestsReceived from '@/components/RequestsReceived.vue';
 import VoIP from '@/components/VoIP.vue';
+import Options from '@/components/Options.vue';
 
 export default {
   name: 'Application',
@@ -23,6 +25,7 @@ export default {
     Navbar,
     RequestsReceived,
     VoIP,
+    Options,
   },
 
   mounted() {
