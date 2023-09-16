@@ -30,6 +30,8 @@ export default createStore({
     showFriendRequestList: false,
     voIP: {
       inVoIP: false,
+      loading: false,
+      matchedUser: {},
     },
   },
   getters,
