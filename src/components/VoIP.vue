@@ -1,5 +1,12 @@
 <template>
+  <div v-if="!$store.state.voIP.loading" class="loading">
+    <p>Estabelecendo conexão</p>
+    <div>
+      <Loading :background="true" />
+    </div>
+  </div>
   <div
+    v-else
     id="voip-container"
     class="no-dragging"
     :class="{'dragging': dragging}"
@@ -28,23 +35,28 @@
     >
 
     <img
-      v-if="$store.state.user.imageURL !== ''"
-      :src="$store.state.user.imageURL"
-      :alt="$store.state.user.name"
+      v-if="$store.state.voIP.matchedUser.imageURL !== ''"
+      :src="$store.state.voIP.matchedUser.imageURL"
+      :alt="$store.state.voIP.matchedUser.name"
       class="user-image contact"
+      @mousedown="showMenu"
     >
     <img
       v-else
       src="@/assets/images/user-no-image.png"
-      :alt="$store.state.user.name"
+      :alt="$store.state.voIP.matchedUser.name"
       class="user-image contact"
+      @mousedown="showMenu"
     >
   </div>
 </template>
 
 <script>
+import Loading from './Loading.vue';
+
 export default {
   name: 'VoIP',
+  components: { Loading },
 
   data() {
     return {
@@ -56,13 +68,20 @@ export default {
         pos4: 0,
       },
       dragging: false,
-      showOptions: false,
     };
   },
 
   methods: {
     endCall() {
       // TODO: encerrar ligação
+    },
+
+    showMenu(e) {
+      e.stopPropagation();
+      this.$store.state.optionsMenu.x = e.clientX;
+      this.$store.state.optionsMenu.y = e.clientY;
+      this.$store.state.optionsMenu.user = this.$store.state.voIP.matchedUser;
+      this.$store.state.optionsMenu.show = !this.$store.state.optionsMenu.show;
     },
 
     dragMouseDown(e) {
@@ -107,7 +126,7 @@ export default {
   position: absolute;
   top: calc(100vh / 2 - 50px);
   left: calc(100vw / 2 - 150px);
-  z-index: 9;
+  z-index: 1;
   width: 300px;
   height: 100px;
   background-color: var(--dark);
@@ -146,5 +165,30 @@ export default {
   cursor: pointer;
   transition: transform 0.2s ease-in-out;
   box-shadow: 0 0 3px 1px rgba(255, 255, 255, 0.5);
+}
+
+.loading {
+  position: absolute;
+  width: 300px;
+  height: 100px;
+  top: calc(100vh / 2 - 50px);
+  left: calc(100vw / 2 - 150px);
+  border: solid 2px var(--accent);
+  border-radius: 15px;
+  background-color: var(--dark);
+}
+
+.loading p {
+  width: 100%;
+  height: 14%;
+  color: var(--white);
+  font-family: var(--pressStart);
+  font-size: 12px;
+  text-align: center;
+  margin: 3px 0;
+}
+
+.loading div {
+  height: 80%;
 }
 </style>
