@@ -245,7 +245,7 @@ export default {
       const result = await this.$store.dispatch('createMatch', match);
 
       if (!result) {
-        this.$store.state.match.inMatch = true;
+        this.$store.state.match.inMatch = false;
         this.informError('Erro ao criar Match!');
       }
     },
