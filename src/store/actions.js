@@ -28,7 +28,6 @@ import {
   writeBatch,
   arrayUnion,
   arrayRemove,
-  addDoc,
 } from 'firebase/firestore';
 
 import {
@@ -127,6 +126,7 @@ export default {
         status: 'offline',
         friendsId: [],
         gamesId,
+        inVoIP: false,
         sentFriendRequests: [],
         receivedFriendRequests: [],
       });
@@ -529,10 +529,8 @@ export default {
     }
   },
 
-  async createVoipOffer(context, id) {
+  async createVoipOffer({ commit, state, dispatch }, id) {
     const voipRef = doc(database, `voips/${id}`);
-    const offerCandidates = collection(database, 'voips', id, 'offerCandidates');
-    const answerCandidates = collection(database, 'voips', id, 'answerCandidates');
 
     let localStream;
     let remoteStream;
@@ -550,6 +548,8 @@ export default {
       localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
 
       peerConnection = new RTCPeerConnection(servers);
+      state.voIP.peerConnection = peerConnection;
+
       remoteStream = new MediaStream();
 
       document.getElementById('track').srcObject = remoteStream;
@@ -566,7 +566,9 @@ export default {
 
       peerConnection.onicecandidate = async (event) => {
         if (event.candidate) {
-          event.candidate && addDoc(offerCandidates, event.candidate.toJSON());
+          event.candidate && updateDoc(voipRef, {
+            offerCandidates: arrayUnion(event.candidate.toJSON()),
+          });
         }
       };
 
@@ -580,32 +582,46 @@ export default {
         },
       });
 
-      onSnapshot(voipRef, (voipSnapshot) => {
+      await updateDoc(doc(database, `gamers/${state.user.id}`), {
+        inVoIP: id,
+      });
+
+      commit('setUser', {
+        inVoIP: id,
+      });
+
+      const unsubscribe = onSnapshot(voipRef, (voipSnapshot) => {
         if (voipSnapshot.exists) {
+          if (voipSnapshot.data()?.hangUp) {
+            dispatch('hangUp', true);
+          }
+
           if (!peerConnection.currentRemoteDescription && voipSnapshot.data()?.answer) {
             peerConnection.setRemoteDescription(voipSnapshot.data().answer);
+          }
+
+          if (peerConnection && voipSnapshot.data()?.answerCandidates) {
+            voipSnapshot.data().answerCandidates.forEach((candidate) => {
+              const regex = /candidate:(\d+)/;
+              const match = candidate.candidate.match(regex);
+              if (!state.voIP.answerCandidates.includes(match[1])) {
+                peerConnection.addIceCandidate(candidate);
+                state.voIP.loading = false;
+                state.voIP.answerCandidates.push(match[1]);
+              }
+            });
           }
         }
       });
 
-      onSnapshot(answerCandidates, (snapshot) => {
-        snapshot.docChanges().forEach((change) => {
-          if (change.type === 'added') {
-            if (peerConnection) {
-              peerConnection.addIceCandidate(change.doc.data());
-            }
-          }
-        });
-      });
+      state.voIP.unsubscribe = unsubscribe;
     } catch (error) {
       console.log(error);
     }
   },
 
-  async createVoipAnswer(context, id) {
+  async createVoipAnswer({ commit, state, dispatch }, id) {
     const voipRef = doc(database, `voips/${id}`);
-    const offerCandidates = collection(database, 'voips', id, 'offerCandidates');
-    const answerCandidates = collection(database, 'voips', id, 'answerCandidates');
 
     let localStream;
     let remoteStream;
@@ -623,6 +639,8 @@ export default {
       localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
 
       peerConnection = new RTCPeerConnection(servers);
+      state.voIP.peerConnection = peerConnection;
+
       remoteStream = new MediaStream();
 
       document.getElementById('track').srcObject = remoteStream;
@@ -639,7 +657,9 @@ export default {
 
       peerConnection.onicecandidate = async (event) => {
         if (event.candidate) {
-          event.candidate && addDoc(answerCandidates, event.candidate.toJSON());
+          event.candidate && updateDoc(voipRef, {
+            answerCandidates: arrayUnion(event.candidate.toJSON()),
+          });
         }
       };
 
@@ -656,18 +676,37 @@ export default {
           },
         });
 
-        onSnapshot(offerCandidates, (snapshot) => {
-          snapshot.docChanges().forEach((change) => {
-            if (change.type === 'added') {
-              if (peerConnection) {
-                peerConnection.addIceCandidate(change.doc.data());
-              }
-            }
-          });
+        await updateDoc(doc(database, `gamers/${state.user.id}`), {
+          inVoIP: id,
         });
+
+        commit('setUser', {
+          inVoIP: id,
+        });
+
+        const unsubscribe = onSnapshot(voipRef, (voipSnapshot) => {
+          if (voipSnapshot.exists) {
+            if (voipSnapshot.data()?.hangUp) {
+              dispatch('hangUp', true);
+            }
+
+            if (peerConnection && voipSnapshot.data()?.offerCandidates) {
+              voipSnapshot.data().offerCandidates.forEach((candidate) => {
+                const regex = /candidate:(\d+)/;
+                const match = candidate.candidate.match(regex);
+                if (!state.voIP.offerCandidates.includes(match[1])) {
+                  peerConnection.addIceCandidate(candidate);
+                  state.voIP.loading = false;
+                  state.voIP.offerCandidates.push(match[1]);
+                }
+              });
+            }
+          }
+        });
+
+        state.voIP.unsubscribe = unsubscribe;
       };
 
-      console.log('criando listener');
       const unsubscribe = onSnapshot(voipRef, (voipSnapshot) => {
         if (voipSnapshot.exists) {
           if (voipSnapshot.data()?.offer) {
@@ -678,6 +717,43 @@ export default {
       });
     } catch (error) {
       console.log(error);
+    }
+  },
+
+  async hangUp({ state, commit }, remove) {
+    try {
+      const voipRef = doc(database, `voips/${state.user.inVoIP}`);
+
+      state.voIP.peerConnection.close();
+
+      state.voIP.unsubscribe();
+
+      await setDoc(voipRef, {
+        hangUp: true,
+      });
+
+      commit('setVoIP', {
+        inVoIP: false,
+        loading: false,
+        matchedUser: {},
+        peerConnection: null,
+        unsubscribe: null,
+      });
+
+      await updateDoc(doc(database, `gamers/${state.user.id}`), {
+        inVoIP: false,
+      });
+
+      commit('setUser', {
+        inVoIP: false,
+      });
+
+      remove && await deleteDoc(voipRef);
+
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
     }
   },
 

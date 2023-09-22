@@ -32,6 +32,10 @@ export default createStore({
       inVoIP: false,
       loading: false,
       matchedUser: {},
+      peerConnection: null,
+      unsubscribe: null,
+      offerCandidates: [],
+      answerCandidates: [],
     },
     optionsMenu: {
       x: 0,
