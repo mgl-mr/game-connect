@@ -28,5 +28,6 @@ module.exports = {
     'vuejs-accessibility/click-events-have-key-events': 'off',
     'vuejs-accessibility/mouse-events-have-key-events': 'off',
     'vuejs-accessibility/form-control-has-label': 'off',
+    'vuejs-accessibility/media-has-caption': 'off',
   },
 };
