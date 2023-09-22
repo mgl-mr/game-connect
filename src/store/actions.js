@@ -28,6 +28,7 @@ import {
   writeBatch,
   arrayUnion,
   arrayRemove,
+  addDoc,
 } from 'firebase/firestore';
 
 import {
@@ -483,7 +484,7 @@ export default {
             imageURL: document.data().gamerImageURL,
           };
 
-          dispatch('createVoIPMath', matchedUser);
+          dispatch('voipMath', matchedUser);
         }
       });
     });
@@ -512,12 +513,172 @@ export default {
     }
   },
 
-  async createVoIPMath({ commit, state }, matchedUser) {
+  async voipMath({ commit, state, dispatch }, matchedUser) {
+    const ids = [state.user.id, matchedUser.id].sort();
+
     commit('setVoIP', {
       matchedUser,
-      inVoIP: true,
+      inVoIP: `${ids[0]}_${ids[1]}`,
       loading: true,
     });
+
+    if (ids[0] === state.user.id) {
+      dispatch('createVoipOffer', `${ids[0]}_${ids[1]}`);
+    } else {
+      dispatch('createVoipAnswer', `${ids[0]}_${ids[1]}`);
+    }
+  },
+
+  async createVoipOffer(context, id) {
+    const voipRef = doc(database, `voips/${id}`);
+    const offerCandidates = collection(database, 'voips', id, 'offerCandidates');
+    const answerCandidates = collection(database, 'voips', id, 'answerCandidates');
+
+    let localStream;
+    let remoteStream;
+    let peerConnection;
+
+    const servers = {
+      iceServers: [
+        {
+          urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'],
+        },
+      ],
+    };
+
+    try {
+      localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+
+      peerConnection = new RTCPeerConnection(servers);
+      remoteStream = new MediaStream();
+
+      document.getElementById('track').srcObject = remoteStream;
+
+      localStream.getTracks().forEach((track) => {
+        peerConnection.addTrack(track, localStream);
+      });
+
+      peerConnection.ontrack = (event) => {
+        event.streams[0].getTracks().forEach((track) => {
+          remoteStream.addTrack(track);
+        });
+      };
+
+      peerConnection.onicecandidate = async (event) => {
+        if (event.candidate) {
+          event.candidate && addDoc(offerCandidates, event.candidate.toJSON());
+        }
+      };
+
+      const offer = await peerConnection.createOffer();
+      await peerConnection.setLocalDescription(offer);
+
+      await setDoc(voipRef, {
+        offer: {
+          sdp: offer.sdp,
+          type: offer.type,
+        },
+      });
+
+      onSnapshot(voipRef, (voipSnapshot) => {
+        if (voipSnapshot.exists) {
+          if (!peerConnection.currentRemoteDescription && voipSnapshot.data()?.answer) {
+            peerConnection.setRemoteDescription(voipSnapshot.data().answer);
+          }
+        }
+      });
+
+      onSnapshot(answerCandidates, (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === 'added') {
+            if (peerConnection) {
+              peerConnection.addIceCandidate(change.doc.data());
+            }
+          }
+        });
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+  async createVoipAnswer(context, id) {
+    const voipRef = doc(database, `voips/${id}`);
+    const offerCandidates = collection(database, 'voips', id, 'offerCandidates');
+    const answerCandidates = collection(database, 'voips', id, 'answerCandidates');
+
+    let localStream;
+    let remoteStream;
+    let peerConnection;
+
+    const servers = {
+      iceServers: [
+        {
+          urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'],
+        },
+      ],
+    };
+
+    try {
+      localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+
+      peerConnection = new RTCPeerConnection(servers);
+      remoteStream = new MediaStream();
+
+      document.getElementById('track').srcObject = remoteStream;
+
+      localStream.getTracks().forEach((track) => {
+        peerConnection.addTrack(track, localStream);
+      });
+
+      peerConnection.ontrack = (event) => {
+        event.streams[0].getTracks().forEach((track) => {
+          remoteStream.addTrack(track);
+        });
+      };
+
+      peerConnection.onicecandidate = async (event) => {
+        if (event.candidate) {
+          event.candidate && addDoc(answerCandidates, event.candidate.toJSON());
+        }
+      };
+
+      const callback = async (offer) => {
+        await peerConnection.setRemoteDescription(offer);
+
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+
+        await updateDoc(voipRef, {
+          answer: {
+            sdp: answer.sdp,
+            type: answer.type,
+          },
+        });
+
+        onSnapshot(offerCandidates, (snapshot) => {
+          snapshot.docChanges().forEach((change) => {
+            if (change.type === 'added') {
+              if (peerConnection) {
+                peerConnection.addIceCandidate(change.doc.data());
+              }
+            }
+          });
+        });
+      };
+
+      console.log('criando listener');
+      const unsubscribe = onSnapshot(voipRef, (voipSnapshot) => {
+        if (voipSnapshot.exists) {
+          if (voipSnapshot.data()?.offer) {
+            callback(voipSnapshot.data().offer);
+            unsubscribe();
+          }
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    }
   },
 
   async fetchGames({ commit }) {
