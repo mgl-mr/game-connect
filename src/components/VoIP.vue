@@ -73,8 +73,8 @@ export default {
 
   methods: {
     async endCall() {
-      const response = await this.$store.dispatch('hangUp');
-      console.log(response);
+      const response = await this.$store.dispatch('hangUp', false);
+      // TODO: loading de resposta enquanto tenta deletar
     },
 
     showMenu(e) {
