@@ -6,7 +6,7 @@
       <router-view class="component" />
     </div>
     <RequestsReceived v-show="$store.state.showFriendRequestList"/>
-    <VoIP v-show="$store.state.voIP.inVoIP" />
+    <VoIP v-show="$store.state.voIP.inVoIP !== false" />
     <Options v-show="$store.state.optionsMenu.show" />
   </div>
 </template>
