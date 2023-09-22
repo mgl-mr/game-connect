@@ -1,12 +1,5 @@
 <template>
-  <div v-if="!$store.state.voIP.loading" class="loading">
-    <p>Estabelecendo conexão</p>
-    <div>
-      <Loading :background="true" />
-    </div>
-  </div>
   <div
-    v-else
     id="voip-container"
     class="no-dragging"
     :class="{'dragging': dragging}"
@@ -28,10 +21,15 @@
       class="user-image"
     >
 
+    <div v-if="$store.state.voIP.loading" class="loading">
+      <Loading :background="true" />
+    </div>
     <img
+      v-else
       src="@/assets/images/end_call.png"
       alt="Encerrar ligação"
       class="end-call"
+      @click="endCall"
     >
 
     <img
@@ -48,6 +46,8 @@
       class="user-image contact"
       @mousedown="showMenu"
     >
+
+    <audio id="track" autoplay></audio>
   </div>
 </template>
 
@@ -72,8 +72,9 @@ export default {
   },
 
   methods: {
-    endCall() {
-      // TODO: encerrar ligação
+    async endCall() {
+      const response = await this.$store.dispatch('hangUp');
+      console.log(response);
     },
 
     showMenu(e) {
@@ -150,8 +151,8 @@ export default {
 }
 
 .end-call {
-  width: 50px;
-  height: 50px;
+  width: 70px;
+  height: 70px;
 }
 
 .end-call:hover {
@@ -168,27 +169,10 @@ export default {
 }
 
 .loading {
-  position: absolute;
-  width: 300px;
-  height: 100px;
-  top: calc(100vh / 2 - 50px);
-  left: calc(100vw / 2 - 150px);
-  border: solid 2px var(--accent);
-  border-radius: 15px;
-  background-color: var(--dark);
-}
-
-.loading p {
-  width: 100%;
-  height: 14%;
-  color: var(--white);
-  font-family: var(--pressStart);
-  font-size: 12px;
-  text-align: center;
-  margin: 3px 0;
-}
-
-.loading div {
-  height: 80%;
+  width: 70px;
+  height: 70px;
+  position: relative;
+  margin: 0;
+  overflow: visible
 }
 </style>
