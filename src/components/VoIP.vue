@@ -29,7 +29,7 @@
       src="@/assets/images/end_call.png"
       alt="Encerrar ligação"
       class="end-call"
-      @click="endCall"
+      @click="endCall('hangUp')"
     >
 
     <img
@@ -48,6 +48,12 @@
     >
 
     <audio id="track" autoplay></audio>
+
+    <div v-show="$store.state.voIP.error.show" class="error-container">
+      <p class="error">ERROR</p>
+      <p class="message">{{$store.state.voIP.error.message}}</p>
+      <button  @click="endCall('remove')">OK</button>
+    </div>
   </div>
 </template>
 
@@ -72,8 +78,8 @@ export default {
   },
 
   methods: {
-    async endCall() {
-      const response = await this.$store.dispatch('hangUp', false);
+    async endCall(type) {
+      const response = await this.$store.dispatch('hangUp', type);
       // TODO: loading de resposta enquanto tenta deletar
     },
 
@@ -174,5 +180,53 @@ export default {
   position: relative;
   margin: 0;
   overflow: visible
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 15px;
+}
+
+.error-container p {
+  font-family: var(--pressStart);
+  color: white;
+  margin: 0;
+}
+
+.error {
+  width: 100%;
+  text-align: center;
+  font-size: 16px;
+}
+
+.message {
+  width: 90%;
+  font-size: 11px;
+  text-align: justify;
+}
+
+.error-container button {
+  font-family: var(--pressStart);
+  color: var(--white);
+  background-color: var(--dark);
+  border: 1px solid var(--white);
+  border-radius: 5px;
+  padding: 5px;
+}
+
+.error-container button:hover {
+  transform: scale(1.05);
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+  box-shadow: 0 0 3px 1px rgba(255, 255, 255, 0.5);
 }
 </style>

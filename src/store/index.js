@@ -29,6 +29,7 @@ export default createStore({
     },
     showFriendRequestList: false,
     voIP: {
+      id: '',
       inVoIP: false,
       loading: false,
       matchedUser: {},
@@ -36,6 +37,10 @@ export default createStore({
       unsubscribe: null,
       offerCandidates: [],
       answerCandidates: [],
+      error: {
+        show: false,
+        message: '',
+      },
     },
     optionsMenu: {
       x: 0,

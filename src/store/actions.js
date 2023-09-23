@@ -544,6 +544,8 @@ export default {
       ],
     };
 
+    commit('setVoIP', { id });
+
     try {
       localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
 
@@ -593,6 +595,19 @@ export default {
       const unsubscribe = onSnapshot(voipRef, (voipSnapshot) => {
         if (voipSnapshot.exists) {
           if (voipSnapshot.data()?.hangUp) {
+            dispatch('hangUp', 'remove');
+          }
+
+          if (voipSnapshot.data()?.error) {
+            commit('setVoIP', {
+              error: {
+                show: true,
+                message: 'Falha na conexão com o destinatário da chamada.',
+              },
+            });
+          }
+
+          if (voipSnapshot.data()?.hangUp) {
             dispatch('hangUp', true);
           }
 
@@ -616,7 +631,14 @@ export default {
 
       state.voIP.unsubscribe = unsubscribe;
     } catch (error) {
-      console.log(error);
+      commit('setVoIP', {
+        error: {
+          show: true,
+          message: 'Erro ao conectar. Certifique-se de permitir acesso do navegador ao microfone.',
+        },
+      });
+
+      dispatch('hangUp', 'error');
     }
   },
 
@@ -634,6 +656,8 @@ export default {
         },
       ],
     };
+
+    commit('setVoIP', { id });
 
     try {
       localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
@@ -687,7 +711,16 @@ export default {
         const unsubscribe = onSnapshot(voipRef, (voipSnapshot) => {
           if (voipSnapshot.exists) {
             if (voipSnapshot.data()?.hangUp) {
-              dispatch('hangUp', true);
+              dispatch('hangUp', 'remove');
+            }
+
+            if (voipSnapshot.data()?.error) {
+              commit('setVoIP', {
+                error: {
+                  show: true,
+                  message: 'Falha na conexão com o destinatário da chamada.',
+                },
+              });
             }
 
             if (peerConnection && voipSnapshot.data()?.offerCandidates) {
@@ -709,6 +742,15 @@ export default {
 
       const unsubscribe = onSnapshot(voipRef, (voipSnapshot) => {
         if (voipSnapshot.exists) {
+          if (voipSnapshot.data()?.error) {
+            commit('setVoIP', {
+              error: {
+                show: true,
+                message: 'Falha na conexão com o destinatário da chamada.',
+              },
+            });
+          }
+
           if (voipSnapshot.data()?.offer) {
             callback(voipSnapshot.data().offer);
             unsubscribe();
@@ -716,23 +758,32 @@ export default {
         }
       });
     } catch (error) {
-      console.log(error);
+      commit('setVoIP', {
+        error: {
+          show: true,
+          message: 'Erro ao conectar. Certifique-se de permitir acesso do navegador ao microfone.',
+        },
+      });
+
+      dispatch('hangUp', 'error');
     }
   },
 
-  async hangUp({ state, commit }, remove) {
+  async hangUp({ state, commit }, type) {
     try {
-      const voipRef = doc(database, `voips/${state.user.inVoIP}`);
+      const voipRef = doc(database, `voips/${state.voIP.id}`);
 
-      state.voIP.peerConnection.close();
+      state.voIP.peerConnection && state.voIP.peerConnection.close();
 
-      state.voIP.unsubscribe();
+      state.voIP.unsubscribe && state.voIP.unsubscribe();
 
-      await setDoc(voipRef, {
-        hangUp: true,
-      });
+      if (type === 'error') {
+        await setDoc(voipRef, { error: true });
+        return;
+      }
 
       commit('setVoIP', {
+        id: '',
         inVoIP: false,
         loading: false,
         matchedUser: {},
@@ -748,7 +799,9 @@ export default {
         inVoIP: false,
       });
 
-      remove && await deleteDoc(voipRef);
+      type === 'hangUp' && await setDoc(voipRef, { hangUp: true });
+
+      type === 'remove' && await deleteDoc(voipRef);
 
       return true;
     } catch (error) {
