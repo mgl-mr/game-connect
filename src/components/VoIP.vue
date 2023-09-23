@@ -1,8 +1,6 @@
 <template>
   <div
     id="voip-container"
-    class="no-dragging"
-    :class="{'dragging': dragging}"
     @mousedown="dragMouseDown"
     @mouseup="dragging = false"
     @mouseleave="dragging = false"
@@ -27,13 +25,37 @@
         <Loading :background="true" />
       </div>
     </div>
-    <img
-      v-else
-      src="@/assets/images/end_call.png"
-      alt="Encerrar ligação"
-      class="end-call"
-      @click="endCall('hangUp')"
-    >
+    <div v-else class="controls">
+      <img
+        src="@/assets/images/end_call.png"
+        alt="Encerrar ligação"
+        class="end-call"
+        @click="endCall('hangUp')"
+      >
+      <div class="audio-buttons">
+        <img
+          v-if="muted"
+          src="@/assets/images/mic_muted.png"
+          alt="Mutar microfone"
+          @click="mute"
+        >
+        <img
+          v-else
+          src="@/assets/images/mic.png"
+          alt="Mutar microfone"
+          @click="mute"
+        >
+        <input
+          type="range"
+          class="volume"
+          @mousedown="draggingVolume = true"
+          @mouseup="draggingVolume = false"
+          @mouseleave="draggingVolume = false"
+          @input="setVolume"
+          v-model="volume"
+        >
+      </div>
+    </div>
 
     <img
       v-if="$store.state.voIP.matchedUser.imageURL !== ''"
@@ -76,13 +98,33 @@ export default {
         pos3: 0,
         pos4: 0,
       },
+      muted: false,
+      volume: 50,
       dragging: false,
+      draggingVolume: false,
     };
   },
 
   methods: {
     async endCall(type) {
       await this.$store.dispatch('hangUp', type);
+    },
+
+    mute() {
+      const audioTrack = this.$store.state.voIP.localStream.getTracks().find((track) => track.kind === 'audio');
+
+      if (audioTrack.enabled) {
+        audioTrack.enabled = false;
+        this.muted = true;
+      } else {
+        audioTrack.enabled = true;
+        this.muted = false;
+      }
+    },
+
+    setVolume() {
+      const vlm = document.getElementById('track');
+      vlm.volume = this.volume / 100;
     },
 
     showMenu(e) {
@@ -94,15 +136,13 @@ export default {
     },
 
     dragMouseDown(e) {
-      e.preventDefault();
       this.dragging = true;
       this.position.pos3 = e.clientX;
       this.position.pos4 = e.clientY;
     },
 
     elementDrag(e) {
-      e.preventDefault();
-      if (this.dragging) {
+      if (this.dragging && !this.draggingVolume) {
         this.position.pos1 = this.position.pos3 - e.clientX;
         this.position.pos2 = this.position.pos4 - e.clientY;
         this.position.pos3 = e.clientX;
@@ -123,6 +163,7 @@ export default {
 
   mounted() {
     this.elmnt = document.getElementById('voip-container');
+    document.getElementById('track').volume = 0;
   },
 };
 </script>
@@ -141,14 +182,7 @@ export default {
   background-color: var(--dark);
   border: solid 2px var(--accent);
   border-radius: 15px;
-}
-
-.no-dragging {
   cursor: grab;
-}
-
-.dragging {
-  cursor: grabbing;
 }
 
 .user-image {
@@ -158,15 +192,61 @@ export default {
   border: 2px solid var(--white);
 }
 
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  width: 100px;
+  height: 100%;
+}
+
 .end-call {
-  width: 70px;
-  height: 70px;
+  width: 50px;
+  height: 50px;
 }
 
 .end-call:hover {
   transform: scale(1.2);
   cursor: pointer;
   transition: transform 0.2s ease-in-out;
+}
+
+.audio-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 30px;
+}
+
+.audio-buttons img {
+  width: 23.44px;
+  height: 100%;
+}
+
+.audio-buttons img:hover {
+  transform: scale(1.2);
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.volume {
+  -webkit-appearance: none;
+  width: 60px;
+  height: 5px;
+  background: #555;
+  border-radius: 5px;
+  margin: 0;
+}
+
+.volume::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 15px;
+  height: 15px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
 }
 
 .contact:hover {

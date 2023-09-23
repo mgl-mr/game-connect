@@ -551,6 +551,7 @@ export default {
 
     try {
       localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      state.voIP.localStream = localStream;
 
       peerConnection = new RTCPeerConnection(servers);
       state.voIP.peerConnection = peerConnection;
@@ -667,6 +668,7 @@ export default {
 
     try {
       localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      state.voIP.localStream = localStream;
 
       peerConnection = new RTCPeerConnection(servers);
       state.voIP.peerConnection = peerConnection;
@@ -795,6 +797,7 @@ export default {
         id: '',
         inVoIP: false,
         matchedUser: {},
+        localStream: null,
         peerConnection: null,
         unsubscribe: null,
         loading: {

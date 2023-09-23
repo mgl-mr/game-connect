@@ -32,6 +32,7 @@ export default createStore({
       id: '',
       inVoIP: false,
       matchedUser: {},
+      localStream: null,
       peerConnection: null,
       unsubscribe: null,
       offerCandidates: [],
