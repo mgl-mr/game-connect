@@ -31,12 +31,15 @@ export default createStore({
     voIP: {
       id: '',
       inVoIP: false,
-      loading: false,
       matchedUser: {},
       peerConnection: null,
       unsubscribe: null,
       offerCandidates: [],
       answerCandidates: [],
+      loading: {
+        show: false,
+        message: '',
+      },
       error: {
         show: false,
         message: '',

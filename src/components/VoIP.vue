@@ -21,8 +21,11 @@
       class="user-image"
     >
 
-    <div v-if="$store.state.voIP.loading" class="loading">
-      <Loading :background="true" />
+    <div v-if="$store.state.voIP.loading.show" class="loading-container">
+      <p>{{ $store.state.voIP.loading.message }}</p>
+      <div class="loading">
+        <Loading :background="true" />
+      </div>
     </div>
     <img
       v-else
@@ -79,8 +82,7 @@ export default {
 
   methods: {
     async endCall(type) {
-      const response = await this.$store.dispatch('hangUp', type);
-      // TODO: loading de resposta enquanto tenta deletar
+      await this.$store.dispatch('hangUp', type);
     },
 
     showMenu(e) {
@@ -174,12 +176,27 @@ export default {
   box-shadow: 0 0 3px 1px rgba(255, 255, 255, 0.5);
 }
 
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  width: 70px;
+  height: 100%;
+}
+
+.loading-container p {
+  font-size: 10px;
+  font-family: var(--pressStart);
+  color: white;
+  margin: 0;
+}
+
 .loading {
   width: 70px;
   height: 70px;
   position: relative;
   margin: 0;
-  overflow: visible
 }
 
 .error-container {

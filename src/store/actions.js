@@ -519,7 +519,10 @@ export default {
     commit('setVoIP', {
       matchedUser,
       inVoIP: `${ids[0]}_${ids[1]}`,
-      loading: true,
+      loading: {
+        show: true,
+        message: 'Estabelecendo conexão',
+      },
     });
 
     if (ids[0] === state.user.id) {
@@ -621,7 +624,10 @@ export default {
               const match = candidate.candidate.match(regex);
               if (!state.voIP.answerCandidates.includes(match[1])) {
                 peerConnection.addIceCandidate(candidate);
-                state.voIP.loading = false;
+                state.voIP.loading = {
+                  show: false,
+                  message: '',
+                };
                 state.voIP.answerCandidates.push(match[1]);
               }
             });
@@ -729,7 +735,10 @@ export default {
                 const match = candidate.candidate.match(regex);
                 if (!state.voIP.offerCandidates.includes(match[1])) {
                   peerConnection.addIceCandidate(candidate);
-                  state.voIP.loading = false;
+                  state.voIP.loading = {
+                    show: false,
+                    message: '',
+                  };
                   state.voIP.offerCandidates.push(match[1]);
                 }
               });
@@ -785,10 +794,17 @@ export default {
       commit('setVoIP', {
         id: '',
         inVoIP: false,
-        loading: false,
         matchedUser: {},
         peerConnection: null,
         unsubscribe: null,
+        loading: {
+          show: false,
+          message: '',
+        },
+        error: {
+          show: false,
+          message: '',
+        },
       });
 
       await updateDoc(doc(database, `gamers/${state.user.id}`), {
