@@ -26,25 +26,29 @@
       </div>
     </div>
     <div v-else class="controls">
-      <img
-        src="@/assets/images/end_call.png"
-        alt="Encerrar ligação"
-        class="end-call"
-        @click="endCall('hangUp')"
-      >
-      <div class="audio-buttons">
+      <div class="buttons-container">
+        <img
+          src="@/assets/images/end_call.png"
+          alt="Encerrar ligação"
+          class="end-call"
+          @click="endCall('hangUp')"
+        >
         <img
           v-if="muted"
           src="@/assets/images/mic_muted.png"
           alt="Mutar microfone"
+          class="mute"
           @click="mute"
         >
         <img
           v-else
           src="@/assets/images/mic.png"
           alt="Mutar microfone"
+          class="mute"
           @click="mute"
         >
+      </div>
+      <div class="volume-container">
         <input
           type="range"
           class="volume"
@@ -54,6 +58,7 @@
           @input="setVolume"
           v-model="volume"
         >
+        <p>{{ volume }}</p>
       </div>
     </div>
 
@@ -197,22 +202,36 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: space-around;
-  width: 100px;
+  width: 90px;
   height: 100%;
 }
 
-.end-call {
-  width: 50px;
+.buttons-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
   height: 50px;
 }
 
-.end-call:hover {
+.end-call {
+  width: 40px;
+  height: 40px;
+}
+
+.mute {
+  width: 23.44px;
+  height: 30px;
+  margin-top: 5px;
+}
+
+.buttons-container img:hover {
   transform: scale(1.2);
   cursor: pointer;
   transition: transform 0.2s ease-in-out;
 }
 
-.audio-buttons {
+.volume-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -220,20 +239,18 @@ export default {
   height: 30px;
 }
 
-.audio-buttons img {
-  width: 23.44px;
-  height: 100%;
-}
-
-.audio-buttons img:hover {
-  transform: scale(1.2);
-  cursor: pointer;
-  transition: transform 0.2s ease-in-out;
+.volume-container p {
+  width: 24px;
+  font-family: var(--pressStart);
+  font-size: 8px;
+  color: var(--accent);
+  text-align: center;
+  margin: 0;
 }
 
 .volume {
   -webkit-appearance: none;
-  width: 60px;
+  width: 70%;
   height: 5px;
   background: #555;
   border-radius: 5px;
