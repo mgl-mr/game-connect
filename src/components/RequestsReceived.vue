@@ -18,7 +18,16 @@
           v-for="(request) in $store.state.user.receivedFriendRequests" :key="request.id"
           class="request"
         >
-          <img :src="request.imageURL" :alt="request.name">
+          <img
+            v-if="request.imageURL !== ''"
+            :src="request.imageURL"
+            :alt="request.name"
+          >
+          <img
+            v-else
+            src="@/assets/images/user-no-image.png"
+            :alt="request.name"
+          >
           <div class="request-user">
             <p>{{ request.name }}</p>
             <div class="request-buttons">

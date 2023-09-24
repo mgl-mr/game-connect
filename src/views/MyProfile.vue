@@ -10,9 +10,15 @@
             @change="pickImage"
           >
           <img
+            v-if="user.imageURL !== ''"
             :src="user.imageURL"
             alt="imagem de perfil"
             :class="{ 'input-error': imageError }"
+          >
+          <img
+            v-else
+            src="@/assets/images/user-no-image.png"
+            alt="imagem de perfil"
           >
           <img
             src="@/assets/images/pick_image.png"
