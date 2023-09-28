@@ -236,7 +236,8 @@ export default {
         maxAge: this.maxAge,
       };
 
-      const birthdate = new Date(this.$store.state.user.birthdate);
+      const dateParts = this.$store.state.user.birthdate.split('/');
+      const birthdate = new Date(dateParts[2], dateParts[1], dateParts[0]);
       const age = Math.floor((new Date() - birthdate) / (365.25 * 24 * 60 * 60 * 1000));
 
       match.age = age;
