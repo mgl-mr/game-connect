@@ -1,6 +1,7 @@
 <template>
   <div class="component-container">
     <div class="chat-container">
+      <loading v-show="loading" class="loading"/>
       <div class="header">
         <div class="friend">
           <img
@@ -49,8 +50,17 @@
 </template>
 
 <script>
+import Loading from './Loading.vue';
+
 export default {
   name: 'Chat',
+  components: { Loading },
+
+  data() {
+    return {
+      loading: false,
+    };
+  },
 
   methods: {
     close() {
@@ -203,5 +213,10 @@ export default {
   transform: scale(1.2);
   cursor: pointer;
   transition: transform 0.2s ease-in-out;
+}
+
+.loading {
+  width: 30%;
+  height: 80%;
 }
 </style>
