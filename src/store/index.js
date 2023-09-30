@@ -52,7 +52,9 @@ export default createStore({
       show: false,
       user: {},
     },
+    messages: [],
     chat: {
+      conversations: {},
       show: false,
       id: '',
       friend: {},
