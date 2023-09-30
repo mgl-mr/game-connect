@@ -352,6 +352,7 @@ export default {
       });
 
       const friendListeners = {};
+      const chatListeners = {};
       const { friends } = state.user;
 
       friendsId.forEach((friendId) => {
@@ -398,6 +399,27 @@ export default {
 
           friendListeners[friendId] = unsubscribe;
         }
+
+        const ids = [id, friendId].sort();
+        const chatId = `${ids[0]}_${ids[1]}`;
+
+        if (!(chatId in chatListeners)) {
+          const unsb = onSnapshot(doc(database, 'chats', chatId), (chatSnapshot) => {
+            commit('setListener', unsb);
+
+            if (chatSnapshot.exists && chatSnapshot.data()) {
+              state.chat.conversations[chatId] = chatSnapshot.data();
+
+              if (state.chat.id === chatId) {
+                state.messages = chatSnapshot.data().messages;
+              }
+            } else {
+              state.chat.conversations[chatId] = false;
+            }
+          });
+
+          chatListeners[chatId] = unsb;
+        }
       });
     });
   },
@@ -431,7 +453,6 @@ export default {
       const matchRef = doc(database, `matches/${match.gamerId}`);
       await setDoc(matchRef, match);
     } catch (error) {
-      console.log(error);
       return false;
     }
 
