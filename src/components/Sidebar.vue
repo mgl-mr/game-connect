@@ -84,7 +84,7 @@
         v-else
         v-for="(friend, index) in $store.state.user.friends" :key="index"
         class="friend"
-        @click="showPerfil(friend)"
+        @click="showChat(friend)"
         @mouseover="hover = friend.id"
         @mouseleave="hover = ''"
       >
@@ -127,9 +127,18 @@ export default {
     openReceivedRequests() {
       this.$store.state.showFriendRequestList = true;
     },
-    // eslint-disable-next-line no-unused-vars
-    showPerfil(friend) {
-      // TODO: ir para página de perfil do usuário
+
+    showChat(friend) {
+      const ids = [friend.id, this.$store.state.user.id].sort();
+      this.$store.state.chat = {
+        show: true,
+        id: `${ids[0]}_${ids[1]}`,
+        friend: {
+          id: friend.id,
+          name: friend.name,
+          imageURL: friend.imageURL,
+        },
+      };
     },
   },
 
