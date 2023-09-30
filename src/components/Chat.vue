@@ -38,12 +38,16 @@
           type="text"
           placeholder="mensagem"
           class="input"
+          v-model="text"
+          @keyup.enter="sendMessage"
         >
         <img
-            src="@/assets/images/send.png"
-            alt="enviar mensagem"
-            class="send"
-          >
+          src="@/assets/images/send.png"
+          alt="enviar mensagem"
+          class="send"
+          @click="sendMessage"
+        >
+        <p v-show="error" class="error shake">Erro ao enviar mensagem!!!</p>
       </div>
     </div>
   </div>
@@ -58,11 +62,43 @@ export default {
 
   data() {
     return {
+      messages: [],
+      text: '',
       loading: false,
+      error: false,
     };
   },
 
   methods: {
+    async sendMessage() {
+      this.text = this.text.trim().replace(/\s+/g, ' ');
+
+      if (this.text !== '') {
+        this.loading = true;
+
+        const response = await this.$store.dispatch('sendMessage', {
+          id: this.$store.state.chat.id,
+          message: {
+            from: this.$store.state.user.id,
+            date: new Date(),
+            message: this.text,
+          },
+        });
+
+        this.loading = false;
+
+        if (response) {
+          this.text = '';
+        } else {
+          this.error = false;
+          this.error = true;
+          setTimeout(() => {
+            this.error = false;
+          }, '3000');
+        }
+      }
+    },
+
     close() {
       this.$store.state.chat = {
         show: false,
@@ -176,6 +212,7 @@ export default {
 }
 
 .input-container {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -218,5 +255,28 @@ export default {
 .loading {
   width: 30%;
   height: 80%;
+}
+
+.error {
+  position: absolute;
+  width: 100%;
+  font-size: 10px;
+  font-family: var(--pressStart);
+  color: var(--white);
+  text-align: center;
+  margin: 0;
+  margin-bottom: calc(4vh + 10px);
+}
+
+.shake {
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  50% { transform: translateX(10px); }
+  75% { transform: translateX(-10px); }
+  100% { transform: translateX(0); }
 }
 </style>

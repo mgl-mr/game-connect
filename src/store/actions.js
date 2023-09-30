@@ -829,6 +829,26 @@ export default {
     }
   },
 
+  async sendMessage(context, payload) {
+    const chatRef = doc(database, `chats/${payload.id}`);
+    try {
+      if (payload.new) {
+        await setDoc(chatRef, {
+          messages: arrayUnion(payload.message),
+        });
+      } else {
+        await updateDoc(chatRef, {
+          messages: arrayUnion(payload.message),
+        });
+      }
+
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  },
+
   async fetchGames({ commit }) {
     try {
       const gamesRef = collection(database, 'games');
