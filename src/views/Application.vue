@@ -5,9 +5,10 @@
       <Navbar />
       <router-view class="component" />
     </div>
-    <RequestsReceived v-show="$store.state.showFriendRequestList"/>
+    <RequestsReceived v-show="$store.state.showFriendRequestList" />
     <VoIP v-show="$store.state.voIP.inVoIP !== false" />
     <Options v-show="$store.state.optionsMenu.show" />
+    <Chat v-show="$store.state.chat.show" />
   </div>
 </template>
 
@@ -17,6 +18,7 @@ import Navbar from '@/components/Navbar.vue';
 import RequestsReceived from '@/components/RequestsReceived.vue';
 import VoIP from '@/components/VoIP.vue';
 import Options from '@/components/Options.vue';
+import Chat from '@/components/Chat.vue';
 
 export default {
   name: 'Application',
@@ -26,6 +28,7 @@ export default {
     RequestsReceived,
     VoIP,
     Options,
+    Chat,
   },
 
   mounted() {
