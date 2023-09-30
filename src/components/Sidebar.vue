@@ -130,14 +130,21 @@ export default {
 
     showChat(friend) {
       const ids = [friend.id, this.$store.state.user.id].sort();
-      this.$store.state.chat = {
-        show: true,
-        id: `${ids[0]}_${ids[1]}`,
-        friend: {
-          id: friend.id,
-          name: friend.name,
-          imageURL: friend.imageURL,
-        },
+
+      const id = `${ids[0]}_${ids[1]}`;
+
+      if (this.$store.state.chat.conversations[id]) {
+        this.$store.state.messages = this.$store.state.chat.conversations[id].messages;
+      } else {
+        this.$store.state.messages = [];
+      }
+
+      this.$store.state.chat.show = true;
+      this.$store.state.chat.id = `${ids[0]}_${ids[1]}`;
+      this.$store.state.chat.friend = {
+        id: friend.id,
+        name: friend.name,
+        imageURL: friend.imageURL,
       };
     },
   },

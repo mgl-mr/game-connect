@@ -30,8 +30,20 @@
           >
         </div>
       </div>
-      <div class="messages">
-
+      <div class="messages-container">
+        <div v-if="$store.state.messages.length === 0" class="no-messages">
+          <p>Sem mensagens</p>
+        </div>
+        <div
+          v-else
+          v-for="message in $store.state.messages" :key="message.date.nanoseconds"
+          class="message"
+          :class="{ 'friend-message-container': message.from !== $store.state.user.id }"
+        >
+          <div :class="{ 'my-message': message.from === $store.state.user.id,  'friend-message': message.from !== $store.state.user.id}">
+            {{ message.message }}
+          </div>
+      </div>
       </div>
       <div class="input-container">
         <input
@@ -100,16 +112,11 @@ export default {
     },
 
     close() {
-      this.$store.state.chat = {
-        show: false,
-        id: '',
-        friend: {},
-      };
+      this.$store.state.messages = [];
+      this.$store.state.chat.show = false;
+      this.$store.state.chat.id = '';
+      this.$store.state.chat.friend = {};
     },
-  },
-
-  mounted() {
-    // console.log(this.$store.state.chat);
   },
 };
 </script>
@@ -200,15 +207,62 @@ export default {
   transition: transform 0.2s ease-in-out;
 }
 
-.messages {
+.messages-container {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 80%;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
-.messages::-webkit-scrollbar {
+.messages-container::-webkit-scrollbar {
   width: 0px;
+}
+
+.no-messages {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.no-messages p {
+  font-size: 14px;
+  font-family: var(--pressStart);
+  color: var(--white);
+}
+
+.message {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.message div {
+  display: inline-block;
+  border-radius: 15px;
+  padding: 6px;
+  margin: 5px;
+  max-width: 75%;
+  word-wrap: break-word;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.my-message {
+  background-color: var(--white);
+  color: var(--dark);
+}
+
+.friend-message-container {
+  justify-content: flex-start;
+}
+
+.friend-message {
+  background-color: var(--primary);
+  color: var(--white);
 }
 
 .input-container {
