@@ -52,6 +52,11 @@ export default createStore({
       show: false,
       user: {},
     },
+    chat: {
+      show: false,
+      id: '',
+      friend: {},
+    },
   },
   getters,
   mutations,
