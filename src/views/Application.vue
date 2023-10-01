@@ -9,6 +9,12 @@
     <VoIP v-show="$store.state.voIP.inVoIP !== false" />
     <Options v-show="$store.state.optionsMenu.show" />
     <Chat v-show="$store.state.chat.show" />
+    <ConfirmationModal
+      v-show="$store.state.answerCall.show"
+      :message="$store.state.answerCall.message"
+      @cancel="answerCall(false)"
+      @confirm="answerCall(true)"
+    />
   </div>
 </template>
 
@@ -19,6 +25,7 @@ import RequestsReceived from '@/components/RequestsReceived.vue';
 import VoIP from '@/components/VoIP.vue';
 import Options from '@/components/Options.vue';
 import Chat from '@/components/Chat.vue';
+import ConfirmationModal from '@/components/ConfirmationModal.vue';
 
 export default {
   name: 'Application',
@@ -29,6 +36,13 @@ export default {
     VoIP,
     Options,
     Chat,
+    ConfirmationModal,
+  },
+
+  methods: {
+    answerCall(response) {
+      this.$store.dispatch('answerCall', response);
+    },
   },
 
   mounted() {

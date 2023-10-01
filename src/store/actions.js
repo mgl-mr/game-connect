@@ -429,7 +429,7 @@ export default {
           state.answerCall = {
             show: true,
             message: `${voipSnapshot.data().calling.name} está te ligando. Atender:`,
-            friend: {},
+            friend: voipSnapshot.data().calling,
           };
         }
       }
@@ -594,16 +594,19 @@ export default {
 
             state.chat.loading = false;
 
-            dispatch('createVoipOffer', friend.id);
+            dispatch('createVoipAnswer', friend.id);
           } else {
             unsub();
 
+            state.chat.loading = false;
             state.chat.error.show = false;
             state.chat.error.message = 'Chamada recusada!!!';
             state.chat.error.show = true;
             setTimeout(() => {
               state.chat.error.show = false;
             }, '3000');
+
+            state.voIP.id = friend.id;
 
             dispatch('hangUp', 'remove');
           }
@@ -613,6 +616,45 @@ export default {
       return true;
     } catch (error) {
       return false;
+    }
+  },
+
+  async answerCall({ state, commit, dispatch }, response) {
+    const voipRef = doc(database, `voips/${state.user.id}`);
+
+    if (response) {
+      commit('setVoIP', {
+        matchedUser: state.answerCall.friend,
+        inVoIP: state.user.id,
+        loading: {
+          show: true,
+          message: 'Estabelecendo conexão',
+        },
+      });
+
+      state.chat.loading = false;
+
+      await setDoc(voipRef, {
+        response: true,
+      });
+
+      state.answerCall = {
+        show: false,
+        message: '',
+        friend: {},
+      };
+
+      dispatch('createVoipOffer', state.user.id);
+    } else {
+      updateDoc(voipRef, {
+        response: false,
+      });
+
+      state.answerCall = {
+        show: false,
+        message: '',
+        friend: {},
+      };
     }
   },
 

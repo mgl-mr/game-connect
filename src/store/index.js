@@ -64,6 +64,11 @@ export default createStore({
       },
       loading: false,
     },
+    answerCall: {
+      show: false,
+      message: '',
+      friend: {},
+    },
   },
   getters,
   mutations,
