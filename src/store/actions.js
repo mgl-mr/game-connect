@@ -971,7 +971,7 @@ export default {
   async sendMessage(context, payload) {
     const chatRef = doc(database, `chats/${payload.id}`);
     try {
-      if (payload.new) {
+      if (payload.newMessage) {
         await setDoc(chatRef, {
           messages: arrayUnion(payload.message),
         });
