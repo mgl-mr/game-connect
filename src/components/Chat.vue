@@ -111,7 +111,7 @@ export default {
         this.$store.state.chat.loading = true;
 
         const newMessage = this.$store.state.messages.length === 0;
-        console.log(newMessage);
+
         const response = await this.$store.dispatch('sendMessage', {
           id: this.$store.state.chat.id,
           message: {
