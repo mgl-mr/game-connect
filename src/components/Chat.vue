@@ -1,7 +1,7 @@
 <template>
   <div class="component-container">
     <div class="chat-container">
-      <loading v-show="loading" class="loading"/>
+      <loading v-show="$store.state.chat.loading" class="loading"/>
       <div class="header">
         <div class="friend">
           <img
@@ -21,6 +21,7 @@
             src="@/assets/images/start-call.png"
             alt="Encerrar ligação"
             class="start-call"
+            @click="askCall"
           >
           <img
             src="@/assets/images/close.png"
@@ -59,7 +60,7 @@
           class="send"
           @click="sendMessage"
         >
-        <p v-show="error" class="error shake">Erro ao enviar mensagem!!!</p>
+        <p v-show="$store.state.chat.error.show" class="error shake">{{ $store.state.chat.error.message }}</p>
       </div>
     </div>
   </div>
@@ -76,8 +77,6 @@ export default {
     return {
       messages: [],
       text: '',
-      loading: false,
-      error: false,
     };
   },
 
@@ -86,7 +85,7 @@ export default {
       this.text = this.text.trim().replace(/\s+/g, ' ');
 
       if (this.text !== '') {
-        this.loading = true;
+        this.$store.state.chat.loading = true;
 
         const response = await this.$store.dispatch('sendMessage', {
           id: this.$store.state.chat.id,
@@ -97,17 +96,34 @@ export default {
           },
         });
 
-        this.loading = false;
+        this.$store.state.chat.loading = false;
 
         if (response) {
           this.text = '';
         } else {
-          this.error = false;
-          this.error = true;
+          this.$store.state.chat.error.show = false;
+          this.$store.state.chat.error.message = 'Erro ao enviar mensagem!!!';
+          this.$store.state.chat.error.show = true;
           setTimeout(() => {
-            this.error = false;
+            this.$store.state.chat.error.show = false;
           }, '3000');
         }
+      }
+    },
+
+    async askCall() {
+      this.$store.state.chat.loading = true;
+
+      const response = await this.$store.dispatch('askCall', this.$store.state.chat.friend);
+
+      if (!response) {
+        this.$store.state.chat.loading = false;
+        this.$store.state.chat.error.show = false;
+        this.$store.state.chat.error.message = 'Erro ao iniciar chamada!!!';
+        this.$store.state.chat.error.show = true;
+        setTimeout(() => {
+          this.$store.state.chat.error.show = false;
+        }, '3000');
       }
     },
 

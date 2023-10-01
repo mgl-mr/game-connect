@@ -553,6 +553,58 @@ export default {
     }
   },
 
+  async askCall({ state, commit, dispatch }, friend) {
+    try {
+      const voipRef = doc(database, `voips/${friend.id}`);
+
+      await setDoc(voipRef, {
+        calling: {
+          id: state.user.id,
+          name: state.user.name,
+          imageURL: state.user.imageURL,
+        },
+        response: 'waiting',
+      });
+
+      const unsub = onSnapshot(voipRef, (voipSnapshot) => {
+        if (voipSnapshot.data().response !== 'waiting') {
+          if (voipSnapshot.data().response) {
+            unsub();
+
+            commit('setVoIP', {
+              matchedUser: friend,
+              inVoIP: friend.id,
+              loading: {
+                show: true,
+                message: 'Estabelecendo conexão',
+              },
+            });
+
+            state.chat.loading = false;
+
+            dispatch('createVoipOffer', friend.id);
+          } else {
+            unsub();
+
+            state.chat.error.show = false;
+            state.chat.error.message = 'Chamada recusada!!!';
+            state.chat.error.show = true;
+            setTimeout(() => {
+              state.chat.error.show = false;
+            }, '3000');
+
+            dispatch('hangUp', 'remove');
+          }
+        }
+      });
+
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  },
+
   async createVoipOffer({ commit, state, dispatch }, id) {
     const voipRef = doc(database, `voips/${id}`);
 

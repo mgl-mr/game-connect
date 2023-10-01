@@ -58,6 +58,11 @@ export default createStore({
       show: false,
       id: '',
       friend: {},
+      error: {
+        show: false,
+        message: '',
+      },
+      loading: false,
     },
   },
   getters,
