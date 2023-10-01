@@ -422,6 +422,18 @@ export default {
         }
       });
     });
+
+    onSnapshot(doc(database, 'voips', id), (voipSnapshot) => {
+      if (voipSnapshot.exists && voipSnapshot.data()?.calling && voipSnapshot.data()?.response) {
+        if (voipSnapshot.data().response === 'waiting') {
+          state.answerCall = {
+            show: true,
+            message: `${voipSnapshot.data().calling.name} está te ligando. Atender:`,
+            friend: {},
+          };
+        }
+      }
+    });
   },
 
   async fetchSuggestions({ commit }, ids) {
@@ -600,7 +612,6 @@ export default {
 
       return true;
     } catch (error) {
-      console.log(error);
       return false;
     }
   },
@@ -897,7 +908,6 @@ export default {
 
       return true;
     } catch (error) {
-      console.error(error);
       return false;
     }
   },
@@ -917,7 +927,6 @@ export default {
 
       return true;
     } catch (error) {
-      console.log(error);
       return false;
     }
   },
