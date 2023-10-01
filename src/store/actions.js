@@ -337,7 +337,7 @@ export default {
     }
   },
 
-  fetchListeners({ commit, state }, id) {
+  fetchListeners({ commit, state, dispatch }, id) {
     const unsub = onSnapshot(doc(database, 'gamers', id), (userSnapshot) => {
       commit('setListener', unsub);
 
@@ -432,6 +432,18 @@ export default {
             friend: voipSnapshot.data().calling,
           };
         }
+      }
+
+      if (voipSnapshot.data()?.cancel) {
+        state.answerCall = {
+          show: false,
+          message: '',
+          friend: {},
+        };
+
+        state.voIP.id = state.user.id;
+
+        dispatch('hangUp', 'remove');
       }
     });
   },
@@ -579,8 +591,8 @@ export default {
       });
 
       const unsub = onSnapshot(voipRef, (voipSnapshot) => {
-        if (voipSnapshot.data().response !== 'waiting') {
-          if (voipSnapshot.data().response) {
+        if (voipSnapshot.data()?.response) {
+          if (voipSnapshot.data()?.response === true) {
             unsub();
 
             commit('setVoIP', {
@@ -595,7 +607,7 @@ export default {
             state.chat.loading = false;
 
             dispatch('createVoipAnswer', friend.id);
-          } else {
+          } else if (voipSnapshot.data()?.response === false) {
             unsub();
 
             state.chat.loading = false;
@@ -945,6 +957,8 @@ export default {
       });
 
       type === 'hangUp' && await setDoc(voipRef, { hangUp: true });
+
+      type === 'cancel' && await setDoc(voipRef, { cancel: true });
 
       type === 'remove' && await deleteDoc(voipRef);
 

@@ -1,7 +1,15 @@
 <template>
   <div class="component-container">
     <div class="chat-container">
-      <loading v-show="$store.state.chat.loading" class="loading"/>
+      <div v-show="$store.state.chat.loading" class="loading-container">
+        <div>
+          <loading
+            :background="true"
+            class="loading"
+          />
+        </div>
+        <button @click="cancel">CANCELAR</button>
+      </div>
       <div class="header">
         <div class="friend">
           <img
@@ -77,11 +85,13 @@ export default {
     return {
       messages: [],
       text: '',
+      voipLoading: false,
     };
   },
 
   methods: {
     async sendMessage() {
+      this.voipLoading = false;
       this.text = this.text.trim().replace(/\s+/g, ' ');
 
       if (this.text !== '') {
@@ -112,6 +122,7 @@ export default {
     },
 
     async askCall() {
+      this.voipLoading = true;
       this.$store.state.chat.loading = true;
 
       const response = await this.$store.dispatch('askCall', this.$store.state.chat.friend);
@@ -125,6 +136,20 @@ export default {
           this.$store.state.chat.error.show = false;
         }, '3000');
       }
+    },
+
+    cancel() {
+      this.$store.state.chat.loading = false;
+      this.$store.state.chat.error.show = false;
+      this.$store.state.chat.error.message = 'Chamada cancelada!!!';
+      this.$store.state.chat.error.show = true;
+      setTimeout(() => {
+        this.$store.state.chat.error.show = false;
+      }, '3000');
+
+      this.$store.state.voIP.id = this.$store.state.chat.friend.id;
+
+      this.$store.dispatch('hangUp', 'cancel');
     },
 
     close() {
@@ -152,6 +177,7 @@ export default {
   width: 30%;
   height: 80%;
   background-color: var(--dark);
+  position: relative;
 }
 
 .header {
@@ -322,9 +348,49 @@ export default {
   transition: transform 0.2s ease-in-out;
 }
 
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 20px;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.loading-container button {
+  width: 50%;
+  font-family: var(--pressStart);
+  font-size: 12px;
+  color: var(--white);
+  background-color: var(--dark);
+  border: 2px solid var(--white);
+  border-radius: 15px;
+  padding: 10px 0;
+}
+
+.loading-container button:hover {
+  cursor: pointer;
+  box-shadow: 0 0 13px 1px rgba(255, 255, 255, 0.5);
+  transform: scale(1.1);
+  transition: transform 0.2s ease-in-out;
+}
+
+.loading-container button:not(:hover) {
+  transform: scale(1);
+  transition: transform 0.2s ease-in-out;
+}
+
+.loading-container div {
+  width: 80px;
+  height: 80px;
+}
+
 .loading {
-  width: 30%;
-  height: 80%;
+  width: 100%;
+  height:100%;
 }
 
 .error {
