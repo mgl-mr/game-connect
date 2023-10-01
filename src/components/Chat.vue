@@ -8,7 +8,9 @@
             class="loading"
           />
         </div>
-        <button @click="cancel">CANCELAR</button>
+        <button v-show="voipLoading" @click="cancel">
+          CANCELAR
+        </button>
       </div>
       <div class="header">
         <div class="friend">
@@ -39,7 +41,7 @@
           >
         </div>
       </div>
-      <div class="messages-container">
+      <div class="messages-container" id="messages-container">
         <div v-if="$store.state.messages.length === 0" class="no-messages">
           <p>Sem mensagens</p>
         </div>
@@ -83,10 +85,21 @@ export default {
 
   data() {
     return {
-      messages: [],
       text: '',
       voipLoading: false,
     };
+  },
+
+  computed: {
+    count() {
+      return this.$store.state.messages.length;
+    },
+  },
+
+  watch: {
+    count() {
+      this.scrollToBottom();
+    },
   },
 
   methods: {
@@ -157,6 +170,19 @@ export default {
       this.$store.state.chat.show = false;
       this.$store.state.chat.id = '';
       this.$store.state.chat.friend = {};
+    },
+
+    scrollToBottom() {
+      this.$nextTick(() => {
+        const messageContainer = document.getElementById('messages-container');
+
+        if (messageContainer) {
+          const lastMessage = messageContainer.querySelector('.message:last-child');
+          if (lastMessage) {
+            lastMessage.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          }
+        }
+      });
     },
   },
 };
