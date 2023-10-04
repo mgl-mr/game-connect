@@ -406,16 +406,23 @@ export default {
         if (!(chatId in chatListeners)) {
           const unsb = onSnapshot(doc(database, 'chats', chatId), (chatSnapshot) => {
             commit('setListener', unsb);
+            const friend = state.user.friends.find((f) => f.id === friendId);
 
-            if (chatSnapshot.exists && chatSnapshot.data()) {
-              state.chat.conversations[chatId] = chatSnapshot.data();
+            if (chatSnapshot.exists) {
+              if (chatSnapshot.data()) {
+                state.chat.conversations[chatId] = chatSnapshot.data();
+                friend.lastMessage = (chatSnapshot.data().messages[chatSnapshot.data().messages.length - 1].date.seconds);
 
-              if (state.chat.id === chatId) {
-                state.messages = chatSnapshot.data().messages;
+                if (state.chat.id === chatId) {
+                  state.messages = chatSnapshot.data().messages;
+                }
+              } else {
+                state.chat.conversations[chatId] = false;
+                friend.lastMessage = 0;
               }
-            } else {
-              state.chat.conversations[chatId] = false;
             }
+
+            state.user.friends.sort((a, b) => b.lastMessage - a.lastMessage);
           });
 
           chatListeners[chatId] = unsb;
