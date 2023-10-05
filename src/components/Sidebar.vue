@@ -88,21 +88,28 @@
         @mouseover="hover = friend.id"
         @mouseleave="hover = ''"
       >
-        <img v-if="friend.imageURL !== ''"
-          :src="friend.imageURL"
-          class="friend-image"
-          alt="Imagem de perfil"
-        >
-        <img v-else
-          src="@/assets/images/user-no-image.png"
-          class="friend-image"
-          alt="Imagem de perfil"
-        >
-        <p class="friend-name">{{ friend.name }}</p>
-        <div class="status-container">
-          <p v-show="friend.id === hover">{{ friend.status }}</p>
-          <div v-if="friend.status === 'online'" class="online"></div>
-          <div v-else class="offline"></div>
+        <div class="friend-container">
+          <img v-if="friend.imageURL !== ''"
+            :src="friend.imageURL"
+            class="friend-image"
+            alt="Imagem de perfil"
+          >
+          <img v-else
+            src="@/assets/images/user-no-image.png"
+            class="friend-image"
+            alt="Imagem de perfil"
+          >
+          <p class="friend-name">{{ friend.name }}</p>
+        </div>
+        <div class="info-container">
+          <div class="status-container">
+            <p v-show="friend.id === hover">{{ friend.status }}</p>
+            <div v-if="friend.status === 'online'" class="online"></div>
+            <div v-else class="offline"></div>
+          </div>
+          <div v-show="friend.newMessages > 0" class="new-messages">
+            {{ friend.newMessages }}
+          </div>
         </div>
       </div>
     </div>
@@ -139,13 +146,19 @@ export default {
         this.$store.state.messages = [];
       }
 
-      this.$store.state.chat.show = true;
-      this.$store.state.chat.id = `${ids[0]}_${ids[1]}`;
-      this.$store.state.chat.friend = {
-        id: friend.id,
-        name: friend.name,
-        imageURL: friend.imageURL,
-      };
+      if (this.$store.state.chat.friend.id !== friend.id) {
+        this.$store.state.chat.show = true;
+        this.$store.state.chat.id = id;
+        this.$store.state.chat.friend = {
+          id: friend.id,
+          name: friend.name,
+          imageURL: friend.imageURL,
+        };
+
+        if (this.$store.state.messages.length !== 0 && friend.newMessages > 0) {
+          this.$store.dispatch('resetUnseenMessages', this.$store.state.chat.id);
+        }
+      }
     },
   },
 
@@ -297,7 +310,9 @@ export default {
 .friend {
   display: flex;
   align-items: center;
+  justify-content: center;
   width: 100%;
+  height: 54px;
   padding-top: 10px;
   padding-bottom: 5px;
   padding-left: 5px;
@@ -305,7 +320,14 @@ export default {
   position: relative;
 }
 
-.friend-image{
+.friend-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: calc(50% - 5px);
+}
+
+.friend-image {
   width: 50px;
   height: 50px;
   border-radius: 50%;
@@ -316,8 +338,9 @@ export default {
   font-family: var(--pressStart), Arial, Helvetica;
   color: var(--white);
   font-size: 10px;
+  margin: 0;
   margin-left: 10px;
-  width: calc(85% - 59px);
+  width: calc(100% - 64px);
 }
 
 .friend:hover {
@@ -330,13 +353,20 @@ export default {
   transition: transform 0.2s ease-in-out;
 }
 
+.info-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-direction: column;
+  width: calc(50% - 5px);
+  height: 100%;
+}
+
 .status-container {
   display: flex;
   align-items: center;
-  justify-content: center;
-  position: absolute;
-  top: 15px;
-  right: 15px;
+  justify-content: flex-end;
+  width: 100%;
 }
 
 .status-container p {
@@ -351,7 +381,6 @@ export default {
   height: 10px;
   border-radius: 50%;
   border: 1px solid var(--white);
-  margin-left: 3px;
 }
 
 .online {
@@ -361,6 +390,18 @@ export default {
 
 .offline {
   background-color: var(--dark);
+}
+
+.new-messages {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 7px;
+  padding: 5px;
+  font-family: var(--pressStart);
+  background-color: var(--primary);
+  color: var(--white);
+  border-radius: 5px;
 }
 
 @keyframes ring {

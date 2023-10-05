@@ -28,6 +28,7 @@ import {
   writeBatch,
   arrayUnion,
   arrayRemove,
+  increment,
 } from 'firebase/firestore';
 
 import {
@@ -410,15 +411,27 @@ export default {
 
             if (chatSnapshot.exists) {
               if (chatSnapshot.data()) {
-                state.chat.conversations[chatId] = chatSnapshot.data();
-                friend.lastMessage = (chatSnapshot.data().messages[chatSnapshot.data().messages.length - 1].date.seconds);
+                const data = chatSnapshot.data();
+                state.chat.conversations[chatId] = data;
+                friend.lastMessage = (data.messages[data.messages.length - 1].date.seconds);
 
                 if (state.chat.id === chatId) {
-                  state.messages = chatSnapshot.data().messages;
+                  state.messages = data.messages;
+
+                  if (data?.[id] !== 0) {
+                    dispatch('resetUnseenMessages', chatId);
+                  }
+
+                  friend.newMessages = 0;
+                } else if (data?.[id] !== undefined) {
+                  friend.newMessages = data?.[id];
+                } else {
+                  friend.newMessages = 0;
                 }
               } else {
                 state.chat.conversations[chatId] = false;
                 friend.lastMessage = 0;
+                friend.newMessages = 0;
               }
             }
 
@@ -981,17 +994,28 @@ export default {
       if (payload.newMessage) {
         await setDoc(chatRef, {
           messages: arrayUnion(payload.message),
+          [payload.friendId]: increment(1),
         });
       } else {
         await updateDoc(chatRef, {
           messages: arrayUnion(payload.message),
+          [payload.friendId]: increment(1),
         });
       }
 
       return true;
     } catch (error) {
+      console.log(error);
       return false;
     }
+  },
+
+  resetUnseenMessages({ state }, id) {
+    const chatRef = doc(database, `chats/${id}`);
+
+    updateDoc(chatRef, {
+      [state.user.id]: 0,
+    });
   },
 
   async fetchGames({ commit }) {

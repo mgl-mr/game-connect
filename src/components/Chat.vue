@@ -114,6 +114,7 @@ export default {
 
         const response = await this.$store.dispatch('sendMessage', {
           id: this.$store.state.chat.id,
+          friendId: this.$store.state.chat.friend.id,
           message: {
             from: this.$store.state.user.id,
             date: new Date(),
