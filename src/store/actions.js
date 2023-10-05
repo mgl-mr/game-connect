@@ -183,9 +183,11 @@ export default {
       newPass,
       confirmPass,
       id,
+      suggestions,
+      friends,
       ...userUpdate
     } = user;
-
+    console.log(userUpdate);
     try {
       if (newPass !== '') {
         await updatePassword(auth.currentUser, newPass);
