@@ -468,21 +468,23 @@ export default {
     });
   },
 
-  async fetchSuggestions({ commit }, ids) {
+  async fetchSuggestions({ commit, state }, ids) {
     try {
       const suggestionsRef = collection(database, 'gamers');
       const suggestionsQuery = query(suggestionsRef, where('gamesId', 'array-contains-any', ids));
       const snapshot = await getDocs(suggestionsQuery);
-      const suggestions = snapshot.docs.map((document) => ({
-        id: document.id,
-        name: document.data().name,
-        games: document.data().games,
-        bio: document.data().bio,
-        start: document.data().start,
-        end: document.data().end,
-        imageURL: document.data().imageURL,
-        status: document.data().status,
-      }));
+      const suggestions = snapshot.docs
+        .filter((document) => !state.user.friendsId.includes(document.id))
+        .map((document) => ({
+          id: document.id,
+          name: document.data().name,
+          games: document.data().games,
+          bio: document.data().bio,
+          start: document.data().start,
+          end: document.data().end,
+          imageURL: document.data().imageURL,
+          status: document.data().status,
+        }));
 
       commit('setUser', {
         suggestions,
