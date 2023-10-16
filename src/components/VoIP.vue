@@ -6,83 +6,85 @@
     @mouseleave="dragging = false"
     @mousemove="elementDrag"
   >
-    <img
-      v-if="$store.state.user.imageURL !== ''"
-      :src="$store.state.user.imageURL"
-      :alt="$store.state.user.name"
-      class="user-image"
-    >
-    <img
-      v-else
-      src="@/assets/images/user-no-image.png"
-      :alt="$store.state.user.name"
-      class="user-image"
-    >
+    <div class="border">
+      <img
+        v-if="$store.state.user.imageURL !== ''"
+        :src="$store.state.user.imageURL"
+        :alt="$store.state.user.name"
+        class="user-image"
+      >
+      <img
+        v-else
+        src="@/assets/images/user-no-image.png"
+        :alt="$store.state.user.name"
+        class="user-image"
+      >
 
-    <div v-if="$store.state.voIP.loading.show" class="loading-container">
-      <p>{{ $store.state.voIP.loading.message }}</p>
-      <div class="loading">
-        <Loading :background="true" />
+      <div v-if="$store.state.voIP.loading.show" class="loading-container">
+        <p>{{ $store.state.voIP.loading.message }}</p>
+        <div class="loading">
+          <Loading :background="true" />
+        </div>
       </div>
-    </div>
-    <div v-else class="controls">
-      <div class="buttons-container">
-        <img
-          src="@/assets/images/end_call.png"
-          alt="Encerrar ligação"
-          class="end-call"
-          @click="endCall('hangUp')"
-        >
-        <img
-          v-if="muted"
-          src="@/assets/images/mic_muted.png"
-          alt="Mutar microfone"
-          class="mute"
-          @click="mute"
-        >
-        <img
-          v-else
-          src="@/assets/images/mic.png"
-          alt="Mutar microfone"
-          class="mute"
-          @click="mute"
-        >
+      <div v-else class="controls">
+        <div class="buttons-container">
+          <img
+            src="@/assets/images/end_call.png"
+            alt="Encerrar ligação"
+            class="end-call"
+            @click="endCall('hangUp')"
+          >
+          <img
+            v-if="muted"
+            src="@/assets/images/mic_muted.png"
+            alt="Mutar microfone"
+            class="mute"
+            @click="mute"
+          >
+          <img
+            v-else
+            src="@/assets/images/mic.png"
+            alt="Mutar microfone"
+            class="mute"
+            @click="mute"
+          >
+        </div>
+        <div class="volume-container">
+          <input
+            type="range"
+            class="volume"
+            @mousedown="draggingVolume = true"
+            @mouseup="draggingVolume = false"
+            @mouseleave="draggingVolume = false"
+            @input="setVolume"
+            v-model="volume"
+          >
+          <p>{{ volume }}</p>
+        </div>
       </div>
-      <div class="volume-container">
-        <input
-          type="range"
-          class="volume"
-          @mousedown="draggingVolume = true"
-          @mouseup="draggingVolume = false"
-          @mouseleave="draggingVolume = false"
-          @input="setVolume"
-          v-model="volume"
-        >
-        <p>{{ volume }}</p>
+
+      <img
+        v-if="$store.state.voIP.matchedUser.imageURL !== ''"
+        :src="$store.state.voIP.matchedUser.imageURL"
+        :alt="$store.state.voIP.matchedUser.name"
+        class="user-image contact"
+        @mousedown="showMenu"
+      >
+      <img
+        v-else
+        src="@/assets/images/user-no-image.png"
+        :alt="$store.state.voIP.matchedUser.name"
+        class="user-image contact"
+        @mousedown="showMenu"
+      >
+
+      <audio id="track" autoplay></audio>
+
+      <div v-show="$store.state.voIP.error.show" class="error-container">
+        <p class="error">ERROR</p>
+        <p class="message">{{$store.state.voIP.error.message}}</p>
+        <button  @click="endCall('remove')">OK</button>
       </div>
-    </div>
-
-    <img
-      v-if="$store.state.voIP.matchedUser.imageURL !== ''"
-      :src="$store.state.voIP.matchedUser.imageURL"
-      :alt="$store.state.voIP.matchedUser.name"
-      class="user-image contact"
-      @mousedown="showMenu"
-    >
-    <img
-      v-else
-      src="@/assets/images/user-no-image.png"
-      :alt="$store.state.voIP.matchedUser.name"
-      class="user-image contact"
-      @mousedown="showMenu"
-    >
-
-    <audio id="track" autoplay></audio>
-
-    <div v-show="$store.state.voIP.error.show" class="error-container">
-      <p class="error">ERROR</p>
-      <p class="message">{{$store.state.voIP.error.message}}</p>
-      <button  @click="endCall('remove')">OK</button>
     </div>
   </div>
 </template>
@@ -175,19 +177,29 @@ export default {
 
 <style scoped>
 #voip-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
   position: absolute;
   top: calc(100vh / 2 - 50px);
   left: calc(100vw / 2 - 150px);
   z-index: 1;
   width: 300px;
   height: 100px;
+  background-color: transparent;
+  border: solid 2px var(--accent);
+  border-radius: 15px;
+  padding: 2.5px;
+  cursor: grab;
+}
+
+.border {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: calc(100% - 5px);
+  height: calc(100% - 5px);
   background-color: var(--dark);
   border: solid 2px var(--accent);
   border-radius: 15px;
-  cursor: grab;
+  box-shadow: 0 0 15px 1px var(--accent);
 }
 
 .user-image {
