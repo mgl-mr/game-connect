@@ -631,21 +631,21 @@ export default {
             state.chat.loading = false;
 
             dispatch('createVoipAnswer', friend.id);
-          } else if (voipSnapshot.data()?.response === false) {
-            unsub();
-
-            state.chat.loading = false;
-            state.chat.error.show = false;
-            state.chat.error.message = 'Chamada recusada!!!';
-            state.chat.error.show = true;
-            setTimeout(() => {
-              state.chat.error.show = false;
-            }, '3000');
-
-            state.voIP.id = friend.id;
-
-            dispatch('hangUp', 'remove');
           }
+        } else if (voipSnapshot.data().response === false) {
+          unsub();
+
+          state.chat.loading = false;
+          state.chat.error.show = false;
+          state.chat.error.message = 'Chamada recusada!!!';
+          state.chat.error.show = true;
+          setTimeout(() => {
+            state.chat.error.show = false;
+          }, '3000');
+
+          state.voIP.id = friend.id;
+
+          dispatch('hangUp', 'remove');
         }
       });
 
