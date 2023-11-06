@@ -9,6 +9,7 @@
     >
       Sugestões
     </router-link>
+
     <router-link
       to="/application/match"
       :class="{
@@ -18,6 +19,7 @@
     >
       Match
     </router-link>
+
     <router-link
       to="/application/my-profile"
       :class="{
@@ -26,6 +28,16 @@
       }"
     >
       Meu perfil
+    </router-link>
+
+    <router-link
+      to="/application/lobbies"
+      :class="{
+        'auth-link-selected':checkRoute('/application/lobbies'),
+        'auth-link':!checkRoute('/application/lobbies')
+      }"
+    >
+      Lobby
     </router-link>
   </div>
 </template>
