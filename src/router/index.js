@@ -15,6 +15,7 @@ import Application from '@/views/Application.vue';
 import MyProfile from '@/views/MyProfile.vue';
 import Suggestions from '@/views/Suggestions.vue';
 import Match from '@/views/Match.vue';
+import Lobbies from '@/views/Lobbies.vue';
 
 const routes = [
   {
@@ -80,6 +81,11 @@ const routes = [
         path: '/application/match',
         name: 'application/match',
         component: Match,
+      },
+      {
+        path: '/application/lobbies',
+        name: 'application/lobbies',
+        component: Lobbies,
       },
     ],
   },
