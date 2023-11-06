@@ -21,16 +21,6 @@
     </router-link>
 
     <router-link
-      to="/application/my-profile"
-      :class="{
-        'auth-link-selected':checkRoute('/application/my-profile'),
-        'auth-link':!checkRoute('/application/my-profile')
-      }"
-    >
-      Meu perfil
-    </router-link>
-
-    <router-link
       to="/application/lobbies"
       :class="{
         'auth-link-selected':checkRoute('/application/lobbies'),
@@ -38,6 +28,16 @@
       }"
     >
       Lobby
+    </router-link>
+
+    <router-link
+      to="/application/my-profile"
+      :class="{
+        'auth-link-selected':checkRoute('/application/my-profile'),
+        'auth-link':!checkRoute('/application/my-profile')
+      }"
+    >
+      Meu perfil
     </router-link>
   </div>
 </template>
