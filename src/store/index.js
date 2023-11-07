@@ -69,6 +69,7 @@ export default createStore({
       message: '',
       friend: {},
     },
+    lobby: {},
   },
   getters,
   mutations,

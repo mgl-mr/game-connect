@@ -33,6 +33,7 @@
           class="input"
           type="text"
           placeholder="Digite o nome"
+          v-model="lobby.name"
         >
       </div>
 
@@ -41,6 +42,7 @@
         <textarea
           class="input"
           placeholder="Descrição"
+          v-model="lobby.description"
         ></textarea>
       </div>
 
@@ -48,8 +50,9 @@
         <p>Número de jogadores(min. 2 max. 30):</p>
         <input
           class="input"
-          type="text"
+          type="number"
           placeholder="2"
+          v-model="lobby.numMaxGamers"
         >
       </div>
 
@@ -59,6 +62,7 @@
           <input
             class="checkbox"
             type="checkbox"
+            v-model="lobby.private"
           >
           Privado
         </div>
@@ -70,6 +74,7 @@
           <input
             class="checkbox"
             type="checkbox"
+            v-model="lobby.invite"
           >
           Convidar
         </div>
@@ -92,6 +97,7 @@
         <button
           type="button"
           class="create"
+          @click="createLobby"
         >
           CRIAR LOBBY
         </button>
@@ -109,6 +115,14 @@ export default {
 
   data() {
     return {
+      lobby: {
+        name: '',
+        description: '',
+        numMaxGamers: '',
+        private: false,
+        invite: false,
+        game: {},
+      },
       game: [],
       error: false,
       msgError: false,
@@ -118,6 +132,62 @@ export default {
   },
 
   methods: {
+    async createLobby() {
+      if (!this.loading) {
+        if (this.validate()) {
+          // eslint-disable-next-line prefer-destructuring
+          this.lobby.game = this.game[0];
+
+          this.loading = true;
+          const response = await this.$store.dispatch('saveLobby', {
+            lobby: this.lobby,
+            create: true,
+          });
+
+          if (response) {
+            this.$router.push('/application/lobby');
+          } else {
+            this.informError('Erro ao criar lobby.Verifique sua conexão');
+          }
+        }
+      }
+    },
+
+    pickGame(game) {
+      this.game = [game];
+    },
+
+    validate() {
+      this.lobby.name = this.lobby.name.trim();
+      this.lobby.name = this.lobby.name.replace(/\s+/g, ' ');
+
+      this.lobby.description = this.lobby.description.trim();
+      this.lobby.description = this.lobby.description.replace(/\s+/g, ' ');
+
+      if (this.game.length === 0) {
+        this.informError('Selecione um jogo!');
+        return false;
+      }
+
+      if (this.lobby.name.length < 3 || this.lobby.name.length > 30) {
+        this.informError('Nome deve ter entre 3 a 30 caracteres.');
+        return false;
+      }
+
+      if (this.lobby.description.length < 10 || this.lobby.description.length > 100) {
+        this.informError('Descrição deve ter entre 10 a 100 caracteres.');
+        return false;
+      }
+
+      if (typeof this.lobby.numMaxGamers !== 'number' || this.lobby.numMaxGamers < 2 || this.lobby.numMaxGamers > 30) {
+        this.informError('Número de participantes deve ser entre 2 a 30.');
+        return false;
+      }
+      this.lobby.numMaxGamers = parseInt(this.lobby.numMaxGamers, 10);
+
+      return true;
+    },
+
     informError(message) {
       this.msg = message;
       this.error = true;

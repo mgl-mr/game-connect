@@ -29,6 +29,7 @@ import {
   arrayUnion,
   arrayRemove,
   increment,
+  addDoc,
 } from 'firebase/firestore';
 
 import {
@@ -1020,6 +1021,33 @@ export default {
     updateDoc(chatRef, {
       [state.user.id]: 0,
     });
+  },
+
+  async saveLobby({ state }, payload) {
+    const { lobby } = payload;
+    const ref = collection(database, 'lobbies');
+
+    if (payload.create) {
+      lobby.owner = {
+        id: state.user.id,
+        name: state.user.name,
+        imageURL: state.user.imageURL,
+      };
+
+      lobby.gameId = lobby.game.id;
+      lobby.numGamers = 1;
+      lobby.gamers = [];
+
+      try {
+        const response = await addDoc(ref, lobby);
+
+        lobby.id = response.id;
+        state.lobby = lobby;
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
   },
 
   async fetchGames({ commit }) {
