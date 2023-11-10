@@ -147,6 +147,7 @@ export default {
           if (response) {
             this.$router.push('/application/lobby');
           } else {
+            this.loading = false;
             this.informError('Erro ao criar lobby.Verifique sua conexão');
           }
         }
@@ -174,8 +175,8 @@ export default {
         return false;
       }
 
-      if (this.lobby.description.length < 10 || this.lobby.description.length > 100) {
-        this.informError('Descrição deve ter entre 10 a 100 caracteres.');
+      if (this.lobby.description.length < 10 || this.lobby.description.length > 90) {
+        this.informError('Descrição deve ter entre 10 a 90 caracteres.');
         return false;
       }
 
