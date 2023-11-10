@@ -1025,9 +1025,9 @@ export default {
 
   async saveLobby({ state }, payload) {
     const { lobby } = payload;
-    const ref = collection(database, 'lobbies');
 
     if (payload.create) {
+      const ref = collection(database, 'lobbies');
       lobby.owner = {
         id: state.user.id,
         name: state.user.name,
@@ -1043,6 +1043,23 @@ export default {
 
         lobby.id = response.id;
         state.lobby = lobby;
+        return true;
+      } catch (error) {
+        return false;
+      }
+    } else {
+      const ref = doc(database, `lobbies/${lobby.id}`);
+
+      try {
+        await updateDoc(ref, {
+          name: lobby.name,
+          description: lobby.description,
+          game: lobby.game,
+          private: lobby.private,
+          invite: lobby.invite,
+          numMaxGamers: lobby.numMaxGamers,
+        });
+
         return true;
       } catch (error) {
         return false;
