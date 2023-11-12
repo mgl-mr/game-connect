@@ -189,6 +189,10 @@ export default {
         && this.lobby.numGamers === this.$store.state.lobby.numGamers
       );
     },
+
+    countMessages() {
+      return this.$store.state.lobby.messages.length;
+    },
   },
 
   watch: {
@@ -202,6 +206,10 @@ export default {
       if (!newValue && this.$store.state.lobby.owner.id === this.$store.state.user.id) {
         this.refreshLobby();
       }
+    },
+
+    countMessages() {
+      this.scrollToBottom();
     },
   },
 
@@ -263,6 +271,23 @@ export default {
       this.game = [game];
       this.lobby.game = game;
       this.choseGame = false;
+    },
+
+    scrollToBottom() {
+      this.$nextTick(() => {
+        const messageContainer = document.getElementById('messages-container');
+
+        if (messageContainer) {
+          console.log('messageContainer');
+          console.log(messageContainer);
+          const lastMessage = messageContainer.querySelector('.message-div:last-child');
+          if (lastMessage) {
+            console.log('lastMessage');
+            console.log(lastMessage);
+            lastMessage.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          }
+        }
+      });
     },
 
     refreshLobby() {
@@ -612,7 +637,7 @@ export default {
   border-radius: 15px;
   padding: 6px;
   margin: 5px;
-  max-width: 75%;
+  max-width: 60%;
   word-wrap: break-word;
   font-family: Arial, Helvetica, sans-serif;
   background-color: var(--primary);
