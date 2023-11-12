@@ -79,7 +79,56 @@
       </div>
     </div>
 
-    <div class="container"></div>
+    <div class="container">
+      <div class="chat-container">
+        <div v-show="chatLoading" class="loading-container">
+          <Loading
+            :background="true"
+          />
+        </div>
+
+        <div class="messages-container" id="messages-container">
+          <div
+            v-for="message in lobby.messages" :key="message.date.nanoseconds"
+            class="message-div"
+            :class="{'my-message': message.from.id === $store.state.user.id }"
+          >
+            <img
+              v-show="message.from.imageURL !== '' && message.from.id !== $store.state.user.id"
+              :src="message.from.imageURL"
+              :alt="message.from.name"
+            >
+            <img
+              v-show="message.from.imageURL === '' && message.from.id !== $store.state.user.id"
+              src="@/assets/images/user-no-image.png"
+              :alt="message.from.name"
+            >
+
+            <div>
+              {{ message.message }}
+            </div>
+          </div>
+        </div>
+
+        <div class="input-container">
+          <input
+            type="text"
+            placeholder="mensagem"
+            class="input"
+            v-model="text"
+            :readonly="chatLoading"
+            @keyup.enter="sendMessage"
+          >
+          <img
+            src="@/assets/images/send.png"
+            alt="enviar mensagem"
+            class="send"
+            @click="sendMessage"
+          >
+          <p v-show="errorChat" class="error-message shake">Falha ao enviar mensagem!!!</p>
+        </div>
+      </div>
+    </div>
 
     <div class="div-error">
       <p
@@ -107,10 +156,11 @@
 
 <script>
 import GamePicker from '@/components/GamePicker.vue';
+import Loading from '@/components/Loading.vue';
 
 export default {
   name: 'Libby',
-  components: { GamePicker },
+  components: { GamePicker, Loading },
 
   data() {
     return {
@@ -119,8 +169,11 @@ export default {
       saveLoading: false,
       choseGame: false,
       error: false,
+      chatLoading: false,
+      text: '',
       msgError: false,
       msg: '',
+      errorChat: false,
     };
   },
 
@@ -141,14 +194,12 @@ export default {
   watch: {
     participant(newValue) {
       if (!newValue && this.$store.state.lobby.owner.id !== this.$store.state.user.id) {
-        console.log('wathed: refreshing participant');
         this.refreshLobby();
       }
     },
 
     owner(newValue) {
       if (!newValue && this.$store.state.lobby.owner.id === this.$store.state.user.id) {
-        console.log('wathed: refreshing owner');
         this.refreshLobby();
       }
     },
@@ -169,6 +220,40 @@ export default {
             this.informError('Lobby atualizado com sucesso.');
           } else {
             this.informError('Erro ao criar lobby.Verifique sua conexão');
+          }
+        }
+      }
+    },
+
+    async sendMessage() {
+      if (!this.chatLoading) {
+        this.text = this.text.trim().replace(/\s+/g, ' ');
+
+        if (this.text !== '') {
+          this.chatLoading = true;
+
+          const response = await this.$store.dispatch('sendLobbyMessage', {
+            id: this.lobby.id,
+            message: {
+              from: {
+                id: this.$store.state.user.id,
+                name: this.$store.state.user.name,
+                imageURL: this.$store.state.user.imageURL,
+              },
+              date: new Date(),
+              message: this.text,
+            },
+          });
+
+          this.chatLoading = false;
+
+          if (response) {
+            this.text = '';
+          } else {
+            this.errorChat = true;
+            setTimeout(() => {
+              this.errorChat = false;
+            }, '3000');
           }
         }
       }
@@ -227,7 +312,6 @@ export default {
 
   beforeMount() {
     this.refreshLobby();
-    console.log(this.$store.state.lobby);
   },
 };
 </script>
@@ -489,6 +573,136 @@ export default {
   width: 500px;
   margin: 0 auto;
   box-shadow: 0 0 30px 1px var(--white);
+}
+
+/*** CHAT ***/
+.chat-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: column;
+  width: 60%;
+  height: 100%;
+  border-radius: 15px;
+  background-color: var(--dark);
+}
+
+.messages-container {
+  display: flex;
+  flex-direction: column;
+  width: 95%;
+  height: calc(95% - 15px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-top: 5px;
+}
+
+.messages-container::-webkit-scrollbar {
+  width: 0px;
+}
+
+.message-div {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.message-div div {
+  border-radius: 15px;
+  padding: 6px;
+  margin: 5px;
+  max-width: 75%;
+  word-wrap: break-word;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--primary);
+  color: var(--white);
+}
+
+.my-message {
+  justify-content: flex-end;
+}
+
+.my-message div {
+  background-color: var(--white);
+  color: var(--dark);
+}
+
+.message-div img {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--white);
+  border-radius: 50%;
+}
+
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 95%;
+  height: 5%;
+  background-color: var(--primary);
+  margin-bottom: 5px;
+  border-radius: 5px;
+}
+
+.input {
+  width: calc(100% - 2vh - 15px);
+  height: 100%;
+  background-color: var(--primary);
+  border: none;
+  padding: 0;
+  padding-left: 5px;
+  margin: 0;
+  color: var(--white);
+  border-radius: 5px;
+}
+
+.input:focus {
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--white);
+}
+
+.send {
+  width: 2vh;
+  height: 2vh;
+  margin: 0 5px;
+}
+
+.send:hover {
+  transform: scale(1.2);
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.error-message {
+  position: absolute;
+  width: 100%;
+  font-size: 10px;
+  font-family: var(--pressStart);
+  color: var(--white);
+  text-align: center;
+  margin: 0;
+  margin-bottom: calc(4vh + 10px);
+}
+
+.shake {
+  animation: shake 0.5s;
 }
 
 /*** ERROR ***/

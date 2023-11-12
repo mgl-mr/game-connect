@@ -1072,13 +1072,26 @@ export default {
     }
   },
 
+  async sendLobbyMessage(context, payload) {
+    const ref = doc(database, `lobbies/${payload.id}`);
+    try {
+      await updateDoc(ref, {
+        messages: arrayUnion(payload.message),
+      });
+
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  },
+
   listenerLobby({ state }, id) {
     const ref = doc(database, `lobbies/${id}`);
 
     const { lobby } = state;
 
     const unsubscribe = onSnapshot(ref, (lobbySnapshot) => {
-      console.log('atualizando');
       lobby.description = lobbySnapshot.data().description;
       lobby.game = lobbySnapshot.data().game;
       lobby.gameId = lobbySnapshot.data().gameId;
