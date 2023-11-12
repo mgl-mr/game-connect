@@ -123,6 +123,37 @@ export default {
       msg: '',
     };
   },
+
+  computed: {
+    participant() {
+      return JSON.stringify(this.lobby) === JSON.stringify(this.$store.state.lobby);
+    },
+
+    owner() {
+      return (
+        this.lobby.gamers === this.$store.state.lobby.gamers
+        && this.lobby.messages === this.$store.state.lobby.messages
+        && this.lobby.numGamers === this.$store.state.lobby.numGamers
+      );
+    },
+  },
+
+  watch: {
+    participant(newValue) {
+      if (!newValue && this.$store.state.lobby.owner.id !== this.$store.state.user.id) {
+        console.log('wathed: refreshing participant');
+        this.refreshLobby();
+      }
+    },
+
+    owner(newValue) {
+      if (!newValue && this.$store.state.lobby.owner.id === this.$store.state.user.id) {
+        console.log('wathed: refreshing owner');
+        this.refreshLobby();
+      }
+    },
+  },
+
   methods: {
     async updateLobby() {
       if (!this.loading) {
@@ -196,6 +227,7 @@ export default {
 
   beforeMount() {
     this.refreshLobby();
+    console.log(this.$store.state.lobby);
   },
 };
 </script>

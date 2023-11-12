@@ -1023,7 +1023,7 @@ export default {
     });
   },
 
-  async saveLobby({ state }, payload) {
+  async saveLobby({ state, dispatch }, payload) {
     const { lobby } = payload;
 
     if (payload.create) {
@@ -1032,17 +1032,22 @@ export default {
         id: state.user.id,
         name: state.user.name,
         imageURL: state.user.imageURL,
+        messages: [],
       };
 
       lobby.gameId = lobby.game.id;
       lobby.numGamers = 1;
       lobby.gamers = [];
+      lobby.messages = [];
 
       try {
         const response = await addDoc(ref, lobby);
 
         lobby.id = response.id;
         state.lobby = lobby;
+
+        dispatch('listenerLobby', response.id);
+
         return true;
       } catch (error) {
         return false;
@@ -1065,6 +1070,29 @@ export default {
         return false;
       }
     }
+  },
+
+  listenerLobby({ state }, id) {
+    const ref = doc(database, `lobbies/${id}`);
+
+    const { lobby } = state;
+
+    const unsubscribe = onSnapshot(ref, (lobbySnapshot) => {
+      console.log('atualizando');
+      lobby.description = lobbySnapshot.data().description;
+      lobby.game = lobbySnapshot.data().game;
+      lobby.gameId = lobbySnapshot.data().gameId;
+      lobby.gamers = lobbySnapshot.data().gamers;
+      lobby.invite = lobbySnapshot.data().invite;
+      lobby.messages = lobbySnapshot.data().messages;
+      lobby.name = lobbySnapshot.data().name;
+      lobby.numGamers = lobbySnapshot.data().numGamers;
+      lobby.numMaxGamers = lobbySnapshot.data().numMaxGamers;
+      lobby.owner = lobbySnapshot.data().owner;
+      lobby.private = lobbySnapshot.data().private;
+    });
+
+    state.lobby.unsubscribe = unsubscribe;
   },
 
   async fetchGames({ commit }) {
