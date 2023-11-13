@@ -20,6 +20,8 @@
       <p v-if="requested()">Solicitado</p>
       <p v-else-if="isfriend()" @click="unfriend">Desfazer amizade</p>
       <p v-else @click="sendRequest">Solicitar amizade</p>
+
+      <p v-if="$store.state.optionsMenu.user?.lobby"  @click="giveOwner">Novo dono</p>
     </div>
 
     <div v-show="loading" class="loading">
@@ -55,6 +57,14 @@ export default {
         'sendFriendRequest',
         [user, this.$store.state.optionsMenu.user.id, this.$store.state.user.sentFriendRequests],
       );
+
+      this.loading = false;
+    },
+
+    async giveOwner() {
+      this.loading = true;
+
+      await this.$store.dispatch('giveOwnerLobby', this.$store.state.optionsMenu.user);
 
       this.loading = false;
     },

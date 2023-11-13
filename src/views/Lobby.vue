@@ -330,9 +330,16 @@ export default {
       this.choseGame = false;
     },
 
-    showMenu(e, gamer) {
-      if (gamer.id !== this.$store.state.user.id) {
+    showMenu(e, g) {
+      if (g.id !== this.$store.state.user.id) {
         e.stopPropagation();
+
+        const gamer = g;
+
+        if (this.$store.state.user.id === this.lobby.owner.id) {
+          gamer.lobby = this.lobby.id;
+        }
+
         this.$store.state.optionsMenu.x = e.clientX;
         this.$store.state.optionsMenu.y = e.clientY;
         this.$store.state.optionsMenu.user = gamer;

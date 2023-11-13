@@ -1071,6 +1071,32 @@ export default {
     }
   },
 
+  async giveOwnerLobby({ state }, newOwner) {
+    const newGamers = state.lobby.gamers.filter((g) => g.id !== newOwner.id);
+    newGamers.push({
+      id: state.user.id,
+      name: state.user.name,
+      imageURL: state.user.imageURL,
+    });
+
+    const ref = doc(database, `lobbies/${newOwner.lobby}`);
+
+    try {
+      await updateDoc(ref, {
+        owner: {
+          id: newOwner.id,
+          name: newOwner.name,
+          imageURL: newOwner.imageURL,
+        },
+        gamers: newGamers,
+      });
+
+      return true;
+    } catch (error) {
+      return false;
+    }
+  },
+
   async sendLobbyMessage(context, payload) {
     const ref = doc(database, `lobbies/${payload.id}`);
     try {
