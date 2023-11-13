@@ -175,11 +175,11 @@
         </div>
 
         <div class="button-exit">
-          <div class="button-loading" :class="{'loading':saveLoading}"></div>
+          <div class="button-loading" :class="{'loading':exitLoading}"></div>
           <button
             type="button"
             class="exit"
-            @click="updateLobby"
+            @click="exitLobby"
           >
             SAIR
           </button>
@@ -223,14 +223,15 @@ export default {
     return {
       lobby: {},
       game: [],
-      saveLoading: false,
       choseGame: false,
       error: false,
-      chatLoading: false,
       text: '',
       msgError: false,
       msg: '',
       errorChat: false,
+      saveLoading: false,
+      chatLoading: false,
+      exitLoading: false,
     };
   },
 
@@ -287,6 +288,18 @@ export default {
             this.informError('Erro ao criar lobby.Verifique sua conexão');
           }
         }
+      }
+    },
+
+    async exitLobby() {
+      this.exitLoading = true;
+
+      const response = await this.$store.dispatch('exitLobby');
+
+      this.exitLoading = false;
+
+      if (response) {
+        this.$router.push('/application/lobbies');
       }
     },
 

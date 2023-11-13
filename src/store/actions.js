@@ -1071,6 +1071,45 @@ export default {
     }
   },
 
+  async exitLobby({ state }) {
+    const ref = doc(database, `lobbies/${state.lobby.id}`);
+    const { gamers } = state.lobby;
+
+    try {
+      if (state.user.id === state.lobby.owner.id) {
+        if (+state.lobby.numGamers === 1) {
+          await deleteDoc(ref);
+        } else {
+          const newOwner = gamers.shift();
+
+          await updateDoc(ref, {
+            owner: {
+              id: newOwner.id,
+              name: newOwner.name,
+              imageURL: newOwner.imageURL,
+            },
+            gamers,
+            numGamers: increment(-1),
+          });
+        }
+      } else {
+        const newGamers = gamers.filter((g) => g.id !== state.user.id);
+
+        await updateDoc(ref, {
+          gamers: newGamers,
+          numGamers: increment(-1),
+        });
+      }
+
+      state.lobby.unsubscribe();
+      state.lobby = {};
+
+      return true;
+    } catch (error) {
+      return false;
+    }
+  },
+
   async giveOwnerLobby({ state }, newOwner) {
     const newGamers = state.lobby.gamers.filter((g) => g.id !== newOwner.id);
     newGamers.push({
@@ -1117,17 +1156,19 @@ export default {
     const { lobby } = state;
 
     const unsubscribe = onSnapshot(ref, (lobbySnapshot) => {
-      lobby.description = lobbySnapshot.data().description;
-      lobby.game = lobbySnapshot.data().game;
-      lobby.gameId = lobbySnapshot.data().gameId;
-      lobby.gamers = lobbySnapshot.data().gamers;
-      lobby.invite = lobbySnapshot.data().invite;
-      lobby.messages = lobbySnapshot.data().messages;
-      lobby.name = lobbySnapshot.data().name;
-      lobby.numGamers = lobbySnapshot.data().numGamers;
-      lobby.numMaxGamers = lobbySnapshot.data().numMaxGamers;
-      lobby.owner = lobbySnapshot.data().owner;
-      lobby.private = lobbySnapshot.data().private;
+      if (lobbySnapshot.data()) {
+        lobby.description = lobbySnapshot.data().description;
+        lobby.game = lobbySnapshot.data().game;
+        lobby.gameId = lobbySnapshot.data().gameId;
+        lobby.gamers = lobbySnapshot.data().gamers;
+        lobby.invite = lobbySnapshot.data().invite;
+        lobby.messages = lobbySnapshot.data().messages;
+        lobby.name = lobbySnapshot.data().name;
+        lobby.numGamers = lobbySnapshot.data().numGamers;
+        lobby.numMaxGamers = lobbySnapshot.data().numMaxGamers;
+        lobby.owner = lobbySnapshot.data().owner;
+        lobby.private = lobbySnapshot.data().private;
+      }
     });
 
     state.lobby.unsubscribe = unsubscribe;
