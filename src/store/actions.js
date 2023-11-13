@@ -1032,7 +1032,6 @@ export default {
         id: state.user.id,
         name: state.user.name,
         imageURL: state.user.imageURL,
-        messages: [],
       };
 
       lobby.gameId = lobby.game.id;
