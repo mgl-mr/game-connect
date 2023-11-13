@@ -64,7 +64,15 @@ export default {
     async giveOwner() {
       this.loading = true;
 
-      await this.$store.dispatch('giveOwnerLobby', this.$store.state.optionsMenu.user);
+      const response = await this.$store.dispatch('giveOwnerLobby', this.$store.state.optionsMenu.user);
+      if (response) {
+        this.$store.state.optionsMenu = {
+          x: 0,
+          y: 0,
+          show: false,
+          user: {},
+        };
+      }
 
       this.loading = false;
     },
