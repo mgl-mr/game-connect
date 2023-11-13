@@ -77,6 +77,10 @@
           </div>
         </div>
       </div>
+
+      <div class="voip-container">
+        VoIP em breve
+      </div>
     </div>
 
     <div class="container">
@@ -126,6 +130,58 @@
             @click="sendMessage"
           >
           <p v-show="errorChat" class="error-message shake">Falha ao enviar mensagem!!!</p>
+        </div>
+      </div>
+
+      <div class="container-members-exit">
+        <div class="members">
+          <p>Participantes: {{ lobby.numGamers }}/{{ lobby.numMaxGamers }}</p>
+
+          <div class="owner">
+            <img
+              v-if="lobby.owner.imageURL !== ''"
+              :src="lobby.owner.imageURL"
+              :alt="lobby.owner.name"
+            >
+            <img
+              v-else
+              src="@/assets/images/user-no-image.png"
+              :alt="lobby.owner.name"
+            >
+
+            <p>{{ lobby.owner.name }}</p>
+          </div>
+
+          <div class="members-container">
+            <div
+              v-for="gamer in lobby.gamers" :key="gamer.id"
+              class="member"
+            >
+              <img
+                v-if="gamer.imageURL !== ''"
+                :src="gamer.imageURL"
+                :alt="gamer.name"
+              >
+              <img
+                v-else
+                src="@/assets/images/user-no-image.png"
+                :alt="gamer.name"
+              >
+
+              <p>{{ gamer.name }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="button-exit">
+          <div class="button-loading" :class="{'loading':saveLoading}"></div>
+          <button
+            type="button"
+            class="exit"
+            @click="updateLobby"
+          >
+            SAIR
+          </button>
         </div>
       </div>
     </div>
@@ -367,7 +423,6 @@ export default {
   align-items: center;
   justify-content: space-between;
   width: 95%;
-  background-color: brown;
 }
 
 /*** FORM / INFO ***/
@@ -600,6 +655,19 @@ export default {
   box-shadow: 0 0 30px 1px var(--white);
 }
 
+/*** VOIP ***/
+.voip-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 35%;
+  height: 100%;
+  background-color: var(--dark);
+  color: var(--white);
+  font-family: var(--pressStart);
+  border-radius: 15px;
+}
+
 /*** CHAT ***/
 .chat-container {
   position: relative;
@@ -728,6 +796,137 @@ export default {
 
 .shake {
   animation: shake 0.5s;
+}
+
+/*** MEMBERS ***/
+.container-members-exit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: column;
+  width: 35%;
+  height: 100%;
+}
+
+.members {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: column;
+  width: 100%;
+  height: 85%;
+  background-color: var(--dark);
+  border-radius: 15px;
+}
+
+.members p {
+  font-family: var(--pressStart);
+  color: var(--white);
+  margin: 0;
+  margin-top: 5px;
+}
+
+.members .owner {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 95%;
+  background-color: var(--primary);
+  color: var(--white);
+  border-radius: 15px;
+}
+
+.members img {
+  width: 50px;
+  height: 50px;
+  margin: 5px;
+  border: 1px solid var(--white);
+  border-radius: 50%;
+}
+
+.members-container {
+  width: 95%;
+  height: calc(100% - 105px);
+  margin-bottom: 5px;
+  border-top: 2px solid var(--white);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.members-container::-webkit-scrollbar {
+  width: 0px;
+}
+
+.members-container .member {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  margin-top: 5px;
+}
+
+.members-container .member:hover {
+  cursor: pointer;
+  box-shadow: 0 0 3px 1px rgba(255, 255, 255, 0.5);
+}
+
+.members-container .member:hover > img {
+  transform: scale(1.1);
+  transition: transform 0.2s ease-in-out;
+}
+
+.members-container .member:not(:hover) > img {
+  transform: scale(1);
+  transition: transform 0.2s ease-in-out;
+}
+
+/*** EXIT ***/
+
+.button-exit {
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% - 1vh);
+  background: transparent;
+  border-radius: 15px;
+  height: 10%;
+  border: 0.5vh solid var(--accent);
+}
+
+.exit {
+  position: relative;
+  border: 0;
+  border-radius: 10px;
+  font-family: var(--pressStart);
+  transition: font-size 0.2s ease-in-out;
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
+  background-color: var(--accent);
+  color: var(--primary);
+  font-size: 14px;
+}
+
+.exit:hover {
+  cursor: pointer;
+  font-size: 18px;
+  text-shadow: 0px 0px 2px var(--white);
+}
+
+.button-loading {
+  display: none;
+  position: absolute;
+  left: 0;
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(to right, var(--primary), var(--white));
+  box-shadow: 0 0 3px 1px rgba(255, 255, 255, 0.5);
+}
+
+.loading{
+  display: block;
+  animation: loading 2s linear infinite;
 }
 
 /*** ERROR ***/
