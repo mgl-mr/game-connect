@@ -137,7 +137,7 @@
         <div class="members">
           <p>Participantes: {{ lobby.numGamers }}/{{ lobby.numMaxGamers }}</p>
 
-          <div class="owner">
+          <div class="owner" @mousedown="showMenu($event, lobby.owner)">
             <img
               v-if="lobby.owner.imageURL !== ''"
               :src="lobby.owner.imageURL"
@@ -156,6 +156,7 @@
             <div
               v-for="gamer in lobby.gamers" :key="gamer.id"
               class="member"
+              @mousedown="showMenu($event, gamer)"
             >
               <img
                 v-if="gamer.imageURL !== ''"
@@ -327,6 +328,16 @@ export default {
       this.game = [game];
       this.lobby.game = game;
       this.choseGame = false;
+    },
+
+    showMenu(e, gamer) {
+      if (gamer.id !== this.$store.state.user.id) {
+        e.stopPropagation();
+        this.$store.state.optionsMenu.x = e.clientX;
+        this.$store.state.optionsMenu.y = e.clientY;
+        this.$store.state.optionsMenu.user = gamer;
+        this.$store.state.optionsMenu.show = true;
+      }
     },
 
     scrollToBottom() {
@@ -865,16 +876,19 @@ export default {
   margin-top: 5px;
 }
 
+.members .owner:hover,
 .members-container .member:hover {
   cursor: pointer;
   box-shadow: 0 0 3px 1px rgba(255, 255, 255, 0.5);
 }
 
+.members .owner:hover > img,
 .members-container .member:hover > img {
   transform: scale(1.1);
   transition: transform 0.2s ease-in-out;
 }
 
+.members .owner:not(:hover) > img,
 .members-container .member:not(:hover) > img {
   transform: scale(1);
   transition: transform 0.2s ease-in-out;
