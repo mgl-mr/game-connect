@@ -30,6 +30,7 @@ import {
   arrayRemove,
   increment,
   addDoc,
+  limit,
 } from 'firebase/firestore';
 
 import {
@@ -1172,6 +1173,36 @@ export default {
     });
 
     state.lobby.unsubscribe = unsubscribe;
+  },
+
+  async loadLobbiesSuggestions({ state }) {
+    try {
+      const ref = collection(database, 'lobbies');
+
+      const refQuery = query(ref, where('gameId', 'in', state.user.gamesId), where('private', '==', false), limit(10));
+
+      const snapshot = await getDocs(refQuery);
+
+      const lobbiesSuggestions = snapshot.docs
+        .map((document) => ({
+          id: document.id,
+          name: document.data().name,
+          description: document.data().description,
+          game: document.data().game,
+          gameId: document.data().gameId,
+          gamers: document.data().gamers,
+          messages: document.data().messages,
+          numGamers: document.data().numGamers,
+          numMaxGamers: document.data().numMaxGamers,
+          invite: document.data().invite,
+          private: document.data().private,
+        }));
+
+      return lobbiesSuggestions;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
   },
 
   async fetchGames({ commit }) {
