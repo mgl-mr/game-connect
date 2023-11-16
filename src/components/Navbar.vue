@@ -23,8 +23,8 @@
     <router-link
       to="/application/lobbies"
       :class="{
-        'auth-link-selected':checkRoute('/application/lobbies'),
-        'auth-link':!checkRoute('/application/lobbies')
+        'auth-link-selected':checkRoute('/application/lobbies') || checkRoute('/application/create-lobby') || checkRoute('/application/lobby'),
+        'auth-link':!checkRoute('/application/lobbies') && !checkRoute('/application/create-lobby') && !checkRoute('/application/lobby')
       }"
     >
       Lobby
