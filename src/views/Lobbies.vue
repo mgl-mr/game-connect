@@ -56,7 +56,7 @@
             <button
               type="button"
               class="enter"
-              @click="enterLobby"
+              @click="enterLobby(lobby)"
             >
               ENTRAR
             </button>
@@ -110,13 +110,38 @@ export default {
   },
 
   methods: {
-    async enterLobby() {
-      // TODO: entrar loobby
+    async enterLobby(lobby) {
+      if (this.entering === '') {
+        this.entering = lobby.id;
+
+        const response = await this.$store.dispatch('enterLobby', lobby);
+
+        this.entering = '';
+
+        if (response) {
+          this.$router.push('/application/lobby');
+        } else {
+          this.error = lobby.id;
+        }
+      }
     },
 
-    pickGame(game) {
+    async pickGame(game) {
       this.game = [game];
       this.choseGame = false;
+
+      this.loading = true;
+      const response = await this.$store.dispatch('searchLobbies', game);
+
+      this.loading = false;
+
+      if (response) {
+        this.lobbies = response;
+
+        response.length === 0 && (this.info = 'Nenhum Lobby encontrado.');
+      } else {
+        this.info = 'Erro ao procurar lobbies';
+      }
     },
 
     async loadLobbiesSuggestions() {

@@ -189,7 +189,7 @@ export default {
       friends,
       ...userUpdate
     } = user;
-    console.log(userUpdate);
+
     try {
       if (newPass !== '') {
         await updatePassword(auth.currentUser, newPass);
@@ -1072,6 +1072,27 @@ export default {
     }
   },
 
+  async enterLobby({ state, dispatch }, lobby) {
+    const ref = doc(database, `lobbies/${lobby.id}`);
+    try {
+      await updateDoc(ref, {
+        gamers: arrayUnion({
+          id: state.user.id,
+          name: state.user.name,
+          imageURL: state.user.imageURL,
+        }),
+        numGamers: increment(1),
+      });
+
+      state.lobby = lobby;
+      dispatch('listenerLobby', lobby.id);
+
+      return true;
+    } catch (error) {
+      return false;
+    }
+  },
+
   async exitLobby({ state }) {
     const ref = doc(database, `lobbies/${state.lobby.id}`);
     const { gamers } = state.lobby;
@@ -1175,6 +1196,37 @@ export default {
     state.lobby.unsubscribe = unsubscribe;
   },
 
+  async searchLobbies(context, game) {
+    try {
+      const ref = collection(database, 'lobbies');
+
+      const refQuery = query(ref, where('gameId', '==', game.id), where('private', '==', false));
+
+      const snapshot = await getDocs(refQuery);
+
+      const lobbiesSuggestions = snapshot.docs
+        .filter((document) => document.data().numGamers !== document.data().numMaxGamers)
+        .map((document) => ({
+          id: document.id,
+          name: document.data().name,
+          description: document.data().description,
+          game: document.data().game,
+          gameId: document.data().gameId,
+          gamers: document.data().gamers,
+          messages: document.data().messages,
+          numGamers: document.data().numGamers,
+          numMaxGamers: document.data().numMaxGamers,
+          invite: document.data().invite,
+          private: document.data().private,
+        }));
+
+      return lobbiesSuggestions;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  },
+
   async loadLobbiesSuggestions({ state }) {
     try {
       const ref = collection(database, 'lobbies');
@@ -1184,6 +1236,7 @@ export default {
       const snapshot = await getDocs(refQuery);
 
       const lobbiesSuggestions = snapshot.docs
+        .filter((document) => document.data().numGamers !== document.data().numMaxGamers)
         .map((document) => ({
           id: document.id,
           name: document.data().name,
