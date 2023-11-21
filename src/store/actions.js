@@ -130,8 +130,10 @@ export default {
         friendsId: [],
         gamesId,
         inVoIP: false,
+        inLobby: false,
         sentFriendRequests: [],
         receivedFriendRequests: [],
+        receivedLobbyInvite: false,
       });
 
       sendEmailVerification(userAuth.user);
@@ -349,11 +351,13 @@ export default {
       const { friendsId } = userSnapshot.data();
       const { sentFriendRequests } = userSnapshot.data();
       const { receivedFriendRequests } = userSnapshot.data();
+      const { receivedLobbyInvite } = userSnapshot.data();
 
       commit('setUser', {
         friendsId,
         sentFriendRequests,
         receivedFriendRequests,
+        receivedLobbyInvite,
       });
 
       const friendListeners = {};
@@ -387,6 +391,8 @@ export default {
                 imageURL: friendSnapshot.data().imageURL,
                 games: friendSnapshot.data().games,
                 status: friendSnapshot.data().status,
+                inLobby: friendSnapshot.data().inLobby,
+                inVoIP: friendSnapshot.data().inVoIP,
               };
 
               const existingFriendIndex = friends.findIndex((friend) => friend.id === friendSnapshot.id);
@@ -1039,9 +1045,15 @@ export default {
       lobby.numGamers = 1;
       lobby.gamers = [];
       lobby.messages = [];
+      lobby.guests = [];
 
       try {
         const response = await addDoc(ref, lobby);
+
+        const userRef = doc(database, `gamers/${state.user.id}`);
+        await updateDoc(userRef, {
+          inLobby: response.id,
+        });
 
         lobby.id = response.id;
         state.lobby = lobby;
@@ -1075,7 +1087,9 @@ export default {
   async enterLobby({ state, dispatch }, lobby) {
     const ref = doc(database, `lobbies/${lobby.id}`);
     try {
-      await updateDoc(ref, {
+      const batch = writeBatch(database);
+
+      batch.update(ref, {
         gamers: arrayUnion({
           id: state.user.id,
           name: state.user.name,
@@ -1083,6 +1097,13 @@ export default {
         }),
         numGamers: increment(1),
       });
+
+      const userRef = doc(database, `gamers/${state.user.id}`);
+      batch.update(userRef, {
+        inLobby: lobby.id,
+      });
+
+      await batch.commit();
 
       state.lobby = lobby;
       dispatch('listenerLobby', lobby.id);
@@ -1104,7 +1125,9 @@ export default {
         } else {
           const newOwner = gamers.shift();
 
-          await updateDoc(ref, {
+          const batch = writeBatch(database);
+
+          batch.update(ref, {
             owner: {
               id: newOwner.id,
               name: newOwner.name,
@@ -1113,14 +1136,30 @@ export default {
             gamers,
             numGamers: increment(-1),
           });
+
+          const userRef = doc(database, `gamers/${state.user.id}`);
+          batch.update(userRef, {
+            inLobby: false,
+          });
+
+          await batch.commit();
         }
       } else {
         const newGamers = gamers.filter((g) => g.id !== state.user.id);
 
-        await updateDoc(ref, {
+        const batch = writeBatch(database);
+
+        batch.update(ref, {
           gamers: newGamers,
           numGamers: increment(-1),
         });
+
+        const userRef = doc(database, `gamers/${state.user.id}`);
+        batch.update(userRef, {
+          inLobby: false,
+        });
+
+        await batch.commit();
       }
 
       state.lobby.unsubscribe();
@@ -1167,7 +1206,60 @@ export default {
 
       return true;
     } catch (error) {
-      console.log(error);
+      return false;
+    }
+  },
+
+  async inviteLobby(context, payload) {
+    let ref = doc(database, `lobbies/${payload.data.lobbyId}`);
+
+    const batch = writeBatch(database);
+
+    batch.update(ref, {
+      guests: arrayUnion(payload.friendId),
+    });
+
+    ref = doc(database, `gamers/${payload.friendId}`);
+
+    batch.update(ref, {
+      receivedLobbyInvite: payload.data,
+    });
+
+    try {
+      await batch.commit();
+
+      return true;
+    } catch (error) {
+      return false;
+    }
+  },
+
+  async answerLobbyInvite({ state, dispatch }, payload) {
+    try {
+      const refUser = doc(database, `gamers/${state.user.id}`);
+
+      await updateDoc(refUser, {
+        receivedLobbyInvite: false,
+      });
+
+      if (payload.response) {
+        const ref = doc(database, `lobbies/${payload.lobbyId}`);
+
+        const lobbyDoc = await getDoc(ref);
+        if (lobbyDoc.exists()) {
+          const lobby = lobbyDoc.data();
+          lobby.id = payload.lobbyId;
+
+          const resp = await dispatch('enterLobby', lobby);
+
+          if (!resp) {
+            return false;
+          }
+        }
+      }
+
+      return true;
+    } catch (error) {
       return false;
     }
   },
@@ -1183,6 +1275,7 @@ export default {
         lobby.game = lobbySnapshot.data().game;
         lobby.gameId = lobbySnapshot.data().gameId;
         lobby.gamers = lobbySnapshot.data().gamers;
+        lobby.guests = lobbySnapshot.data().guests;
         lobby.invite = lobbySnapshot.data().invite;
         lobby.messages = lobbySnapshot.data().messages;
         lobby.name = lobbySnapshot.data().name;

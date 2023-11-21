@@ -133,7 +133,7 @@
         </div>
       </div>
 
-      <div class="container-members-exit">
+      <div class="container-members">
         <div class="members">
           <p>Participantes: {{ lobby.numGamers }}/{{ lobby.numMaxGamers }}</p>
 
@@ -151,6 +151,14 @@
 
             <p>{{ lobby.owner.name }}</p>
           </div>
+
+          <button
+            v-show="$store.state.lobby.owner.id === $store.state.user.id || $store.state.lobby.invite"
+            class="invite-button"
+            @click="invite = true; choseGame = false"
+          >
+            CONVIDAR
+          </button>
 
           <div class="members-container">
             <div
@@ -208,6 +216,46 @@
       :initialGamesNumber=40
       class="container-gamer-picker"
     />
+
+    <div v-show="invite" class="invite-container">
+      <div class="header">
+        <p>Convidar amigos</p>
+        <button class="close" @click="invite = false">
+          X
+        </button>
+      </div>
+
+      <div class="invite-error">
+        <p v-show="inviteError" :class="{'input-error': inviteError}">
+          Erro ao convidar amigo!!!
+        </p>
+      </div>
+
+      <div class="friends-container">
+        <Loading v-show="inviteLoading"/>
+        <div
+          v-for="friend in friendsInvite" :key="friend.id"
+          class="friend"
+        >
+          <div class="friend-info">
+            <img
+              v-if="friend.imageURL !== ''"
+              :src="friend.imageURL"
+              :alt="friend.name"
+            >
+            <img
+              v-else
+              src="@/assets/images/user-no-image.png"
+              :alt="friend.name"
+            >
+
+            <p>{{ friend.name }}</p>
+          </div>
+
+          <button @click="inviteFriend(friend.id)">CONVIDAR</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -224,6 +272,7 @@ export default {
       lobby: {},
       game: [],
       choseGame: false,
+      invite: false,
       error: false,
       text: '',
       msgError: false,
@@ -232,6 +281,8 @@ export default {
       saveLoading: false,
       chatLoading: false,
       exitLoading: false,
+      inviteLoading: false,
+      inviteError: false,
     };
   },
 
@@ -250,6 +301,18 @@ export default {
 
     countMessages() {
       return this.$store.state.lobby.messages.length;
+    },
+
+    friendsInvite() {
+      return this.$store.state.user.friends
+        .filter((friend) => !this.lobby.gamers.some((participant) => participant.id === friend.id))
+        .filter((friend) => !this.lobby.guests.some((guestId) => guestId === friend.id))
+        .filter((friend) => friend.inVoIP === false && friend.inLobby === false)
+        .map((friend) => ({
+          id: friend.id,
+          name: friend.name,
+          imageURL: friend.imageURL,
+        }));
     },
   },
 
@@ -337,6 +400,28 @@ export default {
       }
     },
 
+    async inviteFriend(id) {
+      const payload = {
+        friendId: id,
+        data: {
+          from: this.$store.state.user.name,
+          lobbyId: this.lobby.id,
+          game: this.lobby.game.name,
+        },
+      };
+
+      this.inviteLoading = true;
+      const response = await this.$store.dispatch('inviteLobby', payload);
+      this.inviteLoading = false;
+
+      if (!response) {
+        this.inviteError = true;
+        setTimeout(() => {
+          this.inviteError = false;
+        }, 3000);
+      }
+    },
+
     pickGame(game) {
       this.game = [game];
       this.lobby.game = game;
@@ -365,12 +450,8 @@ export default {
         const messageContainer = document.getElementById('messages-container');
 
         if (messageContainer) {
-          console.log('messageContainer');
-          console.log(messageContainer);
           const lastMessage = messageContainer.querySelector('.message-div:last-child');
           if (lastMessage) {
-            console.log('lastMessage');
-            console.log(lastMessage);
             lastMessage.scrollIntoView({ behavior: 'smooth', block: 'end' });
           }
         }
@@ -830,13 +911,30 @@ export default {
 }
 
 /*** MEMBERS ***/
-.container-members-exit {
+.container-members {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-direction: column;
   width: 35%;
   height: 100%;
+}
+
+.invite-button {
+  width: 95%;
+  margin: 5px 0;
+  border: none;
+  border-radius: 15px;
+  font-family: var(--pressStart);
+  font-size: 12px;
+  color: var(--primary);
+  background-color: var(--accent);
+  padding: 3px 0;
+}
+
+.invite-button:hover {
+  cursor: pointer;
+  box-shadow: 0 0 3px 1px rgba(255, 255, 255, 0.5);
 }
 
 .members {
@@ -961,6 +1059,123 @@ export default {
 .loading{
   display: block;
   animation: loading 2s linear infinite;
+}
+
+/*** INVITE ***/
+.invite-container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  position: absolute;
+  width: 500px;
+  border-radius: 15px;
+  margin: 0 auto;
+  box-shadow: 0 0 30px 1px var(--white);
+  background-color: var(--dark);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 95%;
+  margin: 10px 0;
+}
+
+.header p {
+  font-family: var(--pressStart);
+  color: white;
+  font-size: 16px;
+  margin: 0;
+}
+
+.close {
+  color: var(--white);
+  background-color: transparent;
+  border: 1px solid var(--white);
+  border-radius: 50%;
+}
+
+.close:hover {
+  cursor: pointer;
+}
+
+.invite-error {
+  width: 95%;
+  height: 20px;
+  border-bottom: 2px solid var(--white);
+}
+
+.invite-error p {
+  width: 100%;
+  margin: 0;
+  font-family: var(--pressStart);
+  color: var(--white);
+  font-size: 12px;
+  text-align: center;
+}
+
+.friends-container {
+  position: relative;
+  width: 90%;
+  height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 0 0 15px 15px;
+  margin-bottom: 5px;
+}
+
+.friends-container::-webkit-scrollbar {
+  width: 0px;
+}
+
+.friend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.friend-info {
+  width: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  margin: 10px 0;
+}
+
+.friend-info img {
+  width: 50px;
+  height: 50px;
+  border: 1px solid var(--white);
+  border-radius: 50%;
+}
+
+.friend-info p {
+  width: calc(100% - 60px);
+  font-family: var(--pressStart);
+  color: white;
+  font-size: 16px;
+  margin: 0;
+  margin-left: 10px;
+}
+
+.friend button {
+  width: calc(50% - 3px);
+  height: 50px;
+  background-color: var(--accent);
+  font-family: var(--pressStart);
+  font-size: 16px;
+  color: var(--primary);
+  border: none;
+  border-radius: 15px;
+  transition: font-size 0.2s ease-in-out;
+}
+
+.friend button:hover {
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 0 3px 1px var(--white);
 }
 
 /*** ERROR ***/

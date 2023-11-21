@@ -11,9 +11,15 @@
     <Chat v-show="$store.state.chat.show" />
     <ConfirmationModal
       v-show="$store.state.answerCall.show"
-      :message="$store.state.answerCall.message"
+      :message="answerCallMessage"
       @cancel="answerCall(false)"
       @confirm="answerCall(true)"
+    />
+    <ConfirmationModal
+      v-show="$store.state.user.receivedLobbyInvite !== false"
+      :message="answerInviteMessage"
+      @cancel="answerInvite(false)"
+      @confirm="answerInvite(true)"
     />
   </div>
 </template>
@@ -39,9 +45,40 @@ export default {
     ConfirmationModal,
   },
 
+  computed: {
+    answerCallMessage() {
+      if (this.$store.state.answerCall.message) {
+        return this.$store.state.answerCall.message;
+      }
+
+      return '';
+    },
+
+    answerInviteMessage() {
+      if (this.$store.state.user.receivedLobbyInvite !== false) {
+        return `${this.$store.state.user.receivedLobbyInvite.from} está te convidando para um lobby de ${this.$store.state.user.receivedLobbyInvite.game}`;
+      }
+
+      return '';
+    },
+  },
+
   methods: {
     answerCall(response) {
       this.$store.dispatch('answerCall', response);
+    },
+
+    async answerInvite(response) {
+      const payload = {
+        response,
+        lobbyId: this.$store.state.user.receivedLobbyInvite.lobbyId,
+      };
+
+      const resp = await this.$store.dispatch('answerLobbyInvite', payload);
+
+      if (resp && response) {
+        this.$router.push('/application/lobby');
+      }
     },
   },
 
