@@ -41,7 +41,7 @@ import {
 } from 'firebase/storage';
 
 export default {
-  async login({ commit }, userData) {
+  async login({ commit, state, dispatch }, userData) {
     try {
       const credentials = await signInWithEmailAndPassword(
         auth,
@@ -63,6 +63,18 @@ export default {
           user.friends = [];
           user.suggestions = [];
           commit('setUser', user);
+
+          if (userDoc.data().inLobby !== false) {
+            const ref = doc(database, `lobbies/${userDoc.data().inLobby}`);
+
+            const lobbyDoc = await getDoc(ref);
+            if (lobbyDoc.exists()) {
+              state.lobby = lobbyDoc.data();
+              state.lobby.id = userDoc.data().inLobby;
+
+              await dispatch('exitLobby');
+            }
+          }
           return true;
         }
         return 'Erro ao logar.';
@@ -1121,7 +1133,16 @@ export default {
     try {
       if (state.user.id === state.lobby.owner.id) {
         if (+state.lobby.numGamers === 1) {
-          await deleteDoc(ref);
+          const batch = writeBatch(database);
+
+          batch.delete(ref);
+
+          const userRef = doc(database, `gamers/${state.user.id}`);
+          batch.update(userRef, {
+            inLobby: false,
+          });
+
+          await batch.commit();
         } else {
           const newOwner = gamers.shift();
 
