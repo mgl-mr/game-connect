@@ -364,12 +364,14 @@ export default {
       const { sentFriendRequests } = userSnapshot.data();
       const { receivedFriendRequests } = userSnapshot.data();
       const { receivedLobbyInvite } = userSnapshot.data();
+      const { inLobby } = userSnapshot.data();
 
       commit('setUser', {
         friendsId,
         sentFriendRequests,
         receivedFriendRequests,
         receivedLobbyInvite,
+        inLobby,
       });
 
       const friendListeners = {};

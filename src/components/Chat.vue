@@ -139,6 +139,28 @@ export default {
     },
 
     async askCall() {
+      if (this.$store.state.user.inLobby) {
+        this.$store.state.chat.error.show = false;
+        this.$store.state.chat.error.message = 'Saia do lobby para fazer ligações!!!';
+        this.$store.state.chat.error.show = true;
+        setTimeout(() => {
+          this.$store.state.chat.error.show = false;
+        }, '3000');
+
+        return;
+      }
+
+      if (this.$store.state.user.inV) {
+        this.$store.state.chat.error.show = false;
+        this.$store.state.chat.error.message = 'Saia do lobby para fazer ligações!!!';
+        this.$store.state.chat.error.show = true;
+        setTimeout(() => {
+          this.$store.state.chat.error.show = false;
+        }, '3000');
+
+        return;
+      }
+
       this.voipLoading = true;
       this.$store.state.chat.loading = true;
 
