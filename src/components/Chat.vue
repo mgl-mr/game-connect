@@ -150,9 +150,21 @@ export default {
         return;
       }
 
-      if (this.$store.state.user.inV) {
+      if (this.$store.state.user.inMatch) {
         this.$store.state.chat.error.show = false;
-        this.$store.state.chat.error.message = 'Saia do lobby para fazer ligações!!!';
+        this.$store.state.chat.error.message = 'Cancele a match para fazer ligações!!!';
+        this.$store.state.chat.error.show = true;
+        setTimeout(() => {
+          this.$store.state.chat.error.show = false;
+        }, '3000');
+
+        return;
+      }
+
+      const friend = this.$store.state.user.friends.filter((f) => f.id === this.$store.state.chat.friend.id);
+      if (friend[0].inLobby || friend[0].inMatch || friend[0].inVoIP) {
+        this.$store.state.chat.error.show = false;
+        this.$store.state.chat.error.message = 'Usuário ocupado!!!';
         this.$store.state.chat.error.show = true;
         setTimeout(() => {
           this.$store.state.chat.error.show = false;

@@ -143,6 +143,7 @@ export default {
         gamesId,
         inVoIP: false,
         inLobby: false,
+        inMatch: false,
         sentFriendRequests: [],
         receivedFriendRequests: [],
         receivedLobbyInvite: false,
@@ -365,6 +366,7 @@ export default {
       const { receivedFriendRequests } = userSnapshot.data();
       const { receivedLobbyInvite } = userSnapshot.data();
       const { inLobby } = userSnapshot.data();
+      const { inMatch } = userSnapshot.data();
 
       commit('setUser', {
         friendsId,
@@ -372,6 +374,7 @@ export default {
         receivedFriendRequests,
         receivedLobbyInvite,
         inLobby,
+        inMatch,
       });
 
       const friendListeners = {};
@@ -407,6 +410,7 @@ export default {
                 status: friendSnapshot.data().status,
                 inLobby: friendSnapshot.data().inLobby,
                 inVoIP: friendSnapshot.data().inVoIP,
+                inMatch: friendSnapshot.data().inMatch,
               };
 
               const existingFriendIndex = friends.findIndex((friend) => friend.id === friendSnapshot.id);
@@ -520,8 +524,15 @@ export default {
 
   async createMatch({ commit, dispatch, state }, match) {
     try {
+      const batch = writeBatch(database);
+
       const matchRef = doc(database, `matches/${match.gamerId}`);
-      await setDoc(matchRef, match);
+      batch.set(matchRef, match);
+
+      const userRef = doc(database, `gamers/${state.user.id}`);
+      batch.update(userRef, { inMatch: true });
+
+      await batch.commit();
     } catch (error) {
       return false;
     }
@@ -590,7 +601,15 @@ export default {
 
   async deleteMatch({ commit, state }) {
     try {
-      await deleteDoc(doc(database, 'matches', state.user.id));
+      const batch = writeBatch(database);
+
+      const matchRef = doc(database, `matches/${state.user.id}`);
+      batch.delete(matchRef);
+
+      const userRef = doc(database, `gamers/${state.user.id}`);
+      batch.update(userRef, { inMatch: false });
+
+      await batch.commit();
 
       const { match } = state;
       match.unsubscribe && match.unsubscribe();
