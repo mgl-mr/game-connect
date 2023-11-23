@@ -75,6 +75,10 @@ export default {
               await dispatch('exitLobby');
             }
           }
+
+          if (userDoc.data().inMatch) {
+            await dispatch('deleteMatch');
+          }
           return true;
         }
         return 'Erro ao logar.';
