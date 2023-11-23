@@ -503,6 +503,13 @@ export default {
     },
   },
 
+  // eslint-disable-next-line no-unused-vars
+  beforeRouteLeave(to, from, next) {
+    this.$store.dispatch('exitLobby');
+
+    next();
+  },
+
   beforeMount() {
     this.refreshLobby();
   },

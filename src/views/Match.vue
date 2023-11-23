@@ -268,6 +268,13 @@ export default {
       }, 500);
     },
   },
+
+  // eslint-disable-next-line no-unused-vars
+  beforeRouteLeave(to, from, next) {
+    this.$store.dispatch('deleteMatch');
+
+    next();
+  },
 };
 </script>
 
