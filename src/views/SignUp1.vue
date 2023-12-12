@@ -29,6 +29,7 @@
         :class="{ 'input-error': emailError }"
         placeholder="Digite seu email"
         v-model="email"
+        @blur="checkEmail"
       >
     </label>
 
@@ -90,6 +91,7 @@ export default {
       emailError: false,
       passwordError: false,
       confirmError: false,
+      checking: false,
     };
   },
 
@@ -98,6 +100,25 @@ export default {
       e.preventDefault();
       if (this.validate()) {
         this.$router.push('/authentication/sign-up/sign-up2');
+      }
+    },
+
+    async checkEmail() {
+      if (!this.checking) {
+        this.checking = true;
+
+        const response = await this.$store.dispatch('verifyEmail', this.email);
+
+        this.checking = false;
+
+        if (response) {
+          this.msg = 'Email já cadastrado!';
+          this.error = true;
+          this.emailError = true;
+          setTimeout(() => {
+            this.emailError = false;
+          }, 500);
+        }
       }
     },
 

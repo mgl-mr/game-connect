@@ -12,6 +12,7 @@ import {
   sendPasswordResetEmail,
   updatePassword,
   deleteUser,
+  fetchSignInMethodsForEmail,
 } from 'firebase/auth';
 
 import {
@@ -87,6 +88,20 @@ export default {
       return 'Você deve verificar o seu email.';
     } catch (error) {
       return 'Email ou senha icorreto(s).';
+    }
+  },
+
+  async verifyEmail(context, email) {
+    try {
+      const signInMethods = await fetchSignInMethodsForEmail(auth, email);
+
+      if (signInMethods.length > 0) {
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      return false;
     }
   },
 
