@@ -7,13 +7,12 @@
         class="input-image"
       >
       <input
-        type="text"
+        type="date"
         name="birthdate"
         class="input"
         :class="{ 'input-error': birthdateError }"
         placeholder="Digite sua data de nascimento"
         v-model="birthdate"
-        @keydown="formatDate"
       >
     </label>
 
@@ -86,7 +85,7 @@ export default {
         return false;
       }
 
-      const regex = /^(0[1-9]|1\d|2\d|3[01])\/(0[1-9]|1[0-2])\/(\d{4})$/;
+      const regex = /^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
       if (!regex.test(this.birthdate)) {
         this.msg = 'insira uma data válida!';
         this.error = true;
@@ -98,23 +97,6 @@ export default {
       }
 
       return true;
-    },
-
-    formatDate(e) {
-      e.preventDefault();
-
-      if (e.keyCode === 8 && (this.birthdate.length === 3 || this.birthdate.length === 6)) {
-        this.birthdate = this.birthdate.slice(0, -2);
-      } else if (e.keyCode === 8 && this.birthdate.length !== 0) {
-        this.birthdate = this.birthdate.slice(0, -1);
-      }
-
-      if (e.keyCode >= 48 && e.keyCode <= 57 && this.birthdate.length < 10) {
-        this.birthdate += e.key;
-        if (this.birthdate.length === 2 || this.birthdate.length === 5) {
-          this.birthdate += '/';
-        }
-      }
     },
   },
 

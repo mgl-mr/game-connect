@@ -83,7 +83,7 @@
       <div class="container-input birthdate">
         <p>Data de nascimento</p>
         <input
-          type="text"
+          type="date"
           class="input"
           placeholder="dd/mm/yyyy"
           v-model="user.birthdate"
@@ -347,7 +347,7 @@ export default {
         }
       }
 
-      regex = /^(0[1-9]|1\d|2\d|3[01])\/(0[1-9]|1[0-2])\/(\d{4})$/;
+      regex = /^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
       if (!regex.test(this.user.birthdate)) {
         this.informError('insira uma data válida! (DD/MM/YYYY)');
         return false;
