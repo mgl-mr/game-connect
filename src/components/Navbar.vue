@@ -14,7 +14,8 @@
       to="/application/match"
       :class="{
          'auth-link-selected':checkRoute('/application/match'),
-         'auth-link':!checkRoute('/application/match')
+         'auth-link':!checkRoute('/application/match'),
+         'animation': !checkRoute('/application/match') && $store.state.user.inMatch
       }"
     >
       Match
@@ -94,5 +95,30 @@ export default {
   background: rgba(185, 70, 255, 0.1);
   box-shadow: inset 0px 4px 4px #B946FF;
   border-radius: 15px 15px 0px 0px;
+}
+
+@keyframes rainbow-swing {
+  0% {
+    color: var(--accent);
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(5deg);
+  }
+  50% {
+    color: var(--white);
+    transform: rotate(-5deg);
+  }
+  75% {
+    transform: rotate(3deg);
+  }
+  100% {
+    color: var(--accent);
+    transform: rotate(0deg);
+  }
+}
+
+.animation {
+  animation: rainbow-swing 1s ease-in-out infinite ;
 }
 </style>
